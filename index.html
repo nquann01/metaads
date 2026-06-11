@@ -1,142 +1,179 @@
 <!doctype html>
-<html lang="vi">
+<html lang="vi" data-theme="dark">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>JPS Ads Console — Đánh giá Meta Ads</title>
 <style>
   :root{
-    --bg:#FAFAFB; --surface:#FFFFFF; --surface-2:#F4F5F7;
-    --ink:#16181D; --muted:#6B7180; --faint:#9AA0AC;
-    --line:#E7E8EC; --line-strong:#D7D9E0;
-    --accent:#2742E6; --accent-ink:#1B2EA8;
-    --good:#16A34A; --good-bg:#E8F6EE;
-    --ok:#CA8A04;   --ok-bg:#FBF3DD;
-    --warn:#EA580C; --warn-bg:#FCEBDF;
-    --bad:#DC2626;  --bad-bg:#FBE6E6;
+    --bg:#0E1014; --surface:#161922; --surface-2:#1E222D;
+    --ink:#E8EAF0; --muted:#9AA1B2; --faint:#5E6576;
+    --line:#262B38; --line-strong:#333A4B;
+    --accent:#6178FF; --accent-ink:#8395FF;
+    --good:#34D399; --good-bg:rgba(52,211,153,.15);
+    --ok:#FBBF24;   --ok-bg:rgba(251,191,36,.15);
+    --warn:#FB923C; --warn-bg:rgba(251,146,60,.15);
+    --bad:#F87171;  --bad-bg:rgba(248,113,113,.15);
+    --grid:rgba(255,255,255,.07);
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.32);
     --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
     --ui:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-    --radius:12px; --shadow:0 1px 2px rgba(16,18,29,.04),0 6px 20px rgba(16,18,29,.05);
+    --r:14px;
+  }
+  html[data-theme="light"]{
+    --bg:#F6F7FA; --surface:#FFFFFF; --surface-2:#F0F2F7;
+    --ink:#141821; --muted:#5C6475; --faint:#9AA0AC;
+    --line:#E7E9EF; --line-strong:#D6DAE3;
+    --accent:#2742E6; --accent-ink:#1B2EA8;
+    --good:#15803D; --good-bg:#E7F6EC; --ok:#B7791F; --ok-bg:#FBF2DA;
+    --warn:#C2410C; --warn-bg:#FBEADF; --bad:#DC2626; --bad-bg:#FBE5E5;
+    --grid:rgba(16,18,29,.07);
+    --shadow:0 1px 2px rgba(16,18,29,.05),0 8px 24px rgba(16,18,29,.07);
   }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ui);
-       font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ui);font-size:14px;line-height:1.5;
+       -webkit-font-smoothing:antialiased;transition:background .25s,color .25s}
   a{color:var(--accent)}
-  .wrap{max-width:1180px;margin:0 auto;padding:22px 20px 80px}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 20px 90px}
 
-  /* Header */
-  header.top{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
-             padding-bottom:18px;border-bottom:1px solid var(--line);margin-bottom:20px}
-  .brand{font-weight:800;letter-spacing:-.02em;font-size:20px}
-  .brand span{color:var(--accent)}
-  .tag{font-size:12px;color:var(--muted);font-family:var(--mono)}
-  .acct-pill{margin-left:auto;font-size:12.5px;color:var(--muted);
-             background:var(--surface);border:1px solid var(--line);border-radius:999px;
-             padding:5px 12px;font-family:var(--mono)}
+  /* App bar */
+  .appbar{display:flex;align-items:center;gap:14px;padding:18px 0 16px;flex-wrap:wrap}
+  .logo{display:flex;align-items:center;gap:11px}
+  .mark{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--accent),#A78BFA);
+        display:grid;place-items:center;color:#fff;font-weight:900;font-size:15px;letter-spacing:-.03em;box-shadow:0 4px 14px rgba(97,120,255,.4)}
+  .logo b{font-weight:800;letter-spacing:-.02em;font-size:18px}
+  .logo small{display:block;color:var(--muted);font-size:11px;font-family:var(--mono);margin-top:-1px}
+  .bar-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+  .acct-pill{font-size:12px;color:var(--muted);background:var(--surface);border:1px solid var(--line);
+             border-radius:999px;padding:6px 13px;font-family:var(--mono)}
+  .iconbtn{width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:var(--surface);
+           color:var(--ink);cursor:pointer;font-size:15px;display:grid;place-items:center;transition:background .15s}
+  .iconbtn:hover{background:var(--surface-2)}
 
-  /* Config */
-  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
-        box-shadow:var(--shadow)}
+  /* Card */
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
   .config{padding:18px}
   .grid{display:grid;gap:14px}
-  .g4{grid-template-columns:repeat(4,1fr)}
-  .g3{grid-template-columns:repeat(3,1fr)}
-  @media(max-width:820px){.g4,.g3{grid-template-columns:1fr 1fr}}
+  .g4{grid-template-columns:repeat(4,1fr)} .g3{grid-template-columns:repeat(3,1fr)}
+  @media(max-width:860px){.g4,.g3{grid-template-columns:1fr 1fr}}
   @media(max-width:520px){.g4,.g3{grid-template-columns:1fr}}
   label.fld{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--muted);font-weight:600}
   label.fld .hint{font-weight:400;color:var(--faint);font-size:11px}
-  input,select{font:inherit;font-size:13.5px;padding:9px 11px;border:1px solid var(--line-strong);
-        border-radius:9px;background:var(--surface);color:var(--ink);width:100%}
+  input,select{font:inherit;font-size:13.5px;padding:10px 12px;border:1px solid var(--line-strong);border-radius:10px;
+        background:var(--bg);color:var(--ink);width:100%}
+  html[data-theme="light"] input,html[data-theme="light"] select{background:var(--surface)}
   input:focus,select:focus{outline:2px solid var(--accent);outline-offset:-1px;border-color:var(--accent)}
   input::placeholder{color:var(--faint)}
   .row-end{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:16px}
-  .btn{background:var(--accent);color:#fff;border:0;border-radius:10px;padding:11px 20px;
-       font:inherit;font-weight:700;font-size:14px;cursor:pointer;transition:background .15s,transform .05s}
-  .btn:hover{background:var(--accent-ink)}
-  .btn:active{transform:translateY(1px)}
-  .btn:disabled{opacity:.55;cursor:not-allowed}
-  .btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--line-strong);font-weight:600}
-  .btn.ghost:hover{background:var(--surface-2)}
-  .chk{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted)}
-  .chk input{width:auto}
-  .status{font-size:13px;font-family:var(--mono);color:var(--muted)}
-  .status.err{color:var(--bad)}
-  .section-h{display:flex;align-items:baseline;gap:10px;margin:30px 0 13px}
-  .section-h h2{font-size:15px;margin:0;letter-spacing:-.01em}
-  .section-h .sub{font-size:12px;color:var(--muted)}
+  .btn{background:var(--accent);color:#fff;border:0;border-radius:11px;padding:11px 22px;font:inherit;font-weight:700;
+       font-size:14px;cursor:pointer;transition:filter .15s,transform .05s;box-shadow:0 4px 14px rgba(97,120,255,.3)}
+  .btn:hover{filter:brightness(1.08)} .btn:active{transform:translateY(1px)}
+  .btn:disabled{opacity:.5;cursor:not-allowed;box-shadow:none}
+  .btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--line-strong);font-weight:600;box-shadow:none}
+  .btn.ghost:hover{background:var(--surface-2);filter:none}
+  .chk{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted)} .chk input{width:auto}
+  .status{font-size:13px;font-family:var(--mono);color:var(--muted)} .status.err{color:var(--bad)}
   details.adv{margin-top:14px;border-top:1px dashed var(--line);padding-top:14px}
   details.adv>summary{cursor:pointer;font-size:12.5px;color:var(--muted);font-weight:600;list-style:none}
-  details.adv>summary::before{content:"▸ ";color:var(--accent)}
-  details.adv[open]>summary::before{content:"▾ "}
+  details.adv>summary::before{content:"▸ ";color:var(--accent)} details.adv[open]>summary::before{content:"▾ "}
+
+  /* Tabs */
+  .tabs{position:sticky;top:0;z-index:20;display:flex;gap:5px;margin:22px 0 6px;padding:7px;
+        background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(10px);
+        border:1px solid var(--line);border-radius:13px;overflow-x:auto}
+  .tabs button{flex:0 0 auto;border:0;background:transparent;color:var(--muted);font:inherit;font-weight:600;
+        font-size:13px;padding:8px 15px;border-radius:9px;cursor:pointer;white-space:nowrap;transition:all .15s}
+  .tabs button:hover{color:var(--ink)}
+  .tabs button.on{background:var(--accent);color:#fff;box-shadow:0 3px 10px rgba(97,120,255,.35)}
+
+  .section-h{display:flex;align-items:baseline;gap:10px;margin:28px 0 13px;scroll-margin-top:70px}
+  .section-h h2{font-size:15px;margin:0;letter-spacing:-.01em} .section-h .sub{font-size:12px;color:var(--muted)}
 
   /* Scorecards */
-  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-  @media(max-width:820px){.cards{grid-template-columns:1fr 1fr}}
-  .sc{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
-      padding:13px 15px;box-shadow:var(--shadow);opacity:0;transform:translateY(8px);
-      animation:rise .4s ease forwards}
+  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}
+  @media(max-width:860px){.cards{grid-template-columns:1fr 1fr}}
+  .sc{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+      padding:14px 16px 16px;box-shadow:var(--shadow);overflow:hidden;opacity:0;transform:translateY(8px);animation:rise .4s ease forwards}
   @keyframes rise{to{opacity:1;transform:none}}
-  .sc .k{font-size:11.5px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.03em}
-  .sc .v{font-size:24px;font-weight:800;font-family:var(--mono);letter-spacing:-.02em;margin-top:3px}
-  .sc .d{font-size:11.5px;color:var(--faint);margin-top:1px;font-family:var(--mono)}
+  .sc .k{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+  .sc .v{font-size:25px;font-weight:800;font-family:var(--mono);letter-spacing:-.02em;margin-top:4px}
+  .sc .d{font-size:11.5px;color:var(--faint);margin-top:2px;font-family:var(--mono)}
   .v.good{color:var(--good)}.v.ok{color:var(--ok)}.v.warn{color:var(--warn)}.v.bad{color:var(--bad)}
+  .sc .spark{position:absolute;right:0;bottom:0;width:50%;height:34px;opacity:.9}
 
-  /* Funnel signature */
+  /* Trend */
+  .trend{padding:18px}
+  .trend-insight{font-size:13.5px;padding:11px 14px;border-radius:11px;background:var(--surface-2);
+        border-left:3px solid var(--accent);margin-bottom:14px}
+  .trend-insight .bad{color:var(--bad)} .trend-insight .good{color:var(--good)}
+  .trend-insight .ti-d{display:block;margin-top:4px;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  .trend-insight .ti-muted{color:var(--muted)}
+  .mchips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+  .mchip{border:1px solid var(--line-strong);background:transparent;color:var(--muted);font:inherit;font-size:12.5px;
+        font-weight:600;padding:6px 13px;border-radius:999px;cursor:pointer;transition:all .15s}
+  .mchip:hover{color:var(--ink);border-color:var(--accent)}
+  .mchip.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .chart-box{position:relative}
+  #chart svg{width:100%;height:auto;display:block}
+  #chart .grid{stroke:var(--grid);stroke-width:1}
+  #chart .yl{fill:var(--faint);font-size:9px;font-family:var(--mono);text-anchor:end}
+  #chart .xl{fill:var(--faint);font-size:9px;font-family:var(--mono)}
+  #chart .empty{color:var(--muted);font-size:13px;padding:30px;text-align:center}
+  .chart-tip{position:absolute;display:none;pointer-events:none;transform:translate(-50%,-135%);
+        background:var(--ink);color:var(--bg);padding:5px 9px;border-radius:7px;font-size:11.5px;
+        font-family:var(--mono);white-space:nowrap;z-index:5;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+  .chart-tip b{font-weight:800;display:block} .chart-tip span{opacity:.7;font-size:10px}
+
+  /* Funnel */
   .funnel{padding:20px}
-  .funnel .verdict{font-size:13.5px;margin-bottom:16px;padding:11px 14px;border-radius:10px;
+  .funnel .verdict{font-size:13.5px;margin-bottom:16px;padding:11px 14px;border-radius:11px;
         background:var(--surface-2);border-left:3px solid var(--accent)}
-  .funnel .verdict b{font-weight:700}
-  .stage{display:grid;grid-template-columns:150px 1fr 130px;align-items:center;gap:14px;margin:9px 0}
-  @media(max-width:620px){.stage{grid-template-columns:110px 1fr;}.stage .stage-num{display:none}}
+  .stage{display:grid;grid-template-columns:150px 1fr 96px;align-items:center;gap:14px;margin:9px 0}
+  @media(max-width:620px){.stage{grid-template-columns:104px 1fr}.stage .stage-num{display:none}}
   .stage .lbl{font-size:12.5px;color:var(--muted);font-weight:600}
   .stage .lbl small{display:block;color:var(--faint);font-weight:400;font-family:var(--mono);font-size:11px}
-  .bar-track{height:30px;background:var(--surface-2);border-radius:7px;overflow:hidden;position:relative}
-  .bar-fill{height:100%;width:0;border-radius:7px;transition:width .7s cubic-bezier(.2,.7,.2,1);
-        background:linear-gradient(90deg,#3A53F0,#2742E6)}
-  .stage.weak .bar-fill{background:linear-gradient(90deg,#F87171,var(--bad))}
+  .bar-track{height:30px;background:var(--surface-2);border-radius:8px;overflow:hidden}
+  .bar-fill{height:100%;width:0;border-radius:8px;transition:width .7s cubic-bezier(.2,.7,.2,1);
+        background:linear-gradient(90deg,var(--accent),#A78BFA)}
+  .stage.weak .bar-fill{background:linear-gradient(90deg,#FB7185,var(--bad))}
   .stage .stage-num{font-family:var(--mono);font-size:11px;color:var(--faint);text-align:right}
   .conv{font-size:11px;color:var(--faint);font-family:var(--mono);padding:1px 0 6px 164px}
-  @media(max-width:620px){.conv{padding-left:124px}}
+  @media(max-width:620px){.conv{padding-left:118px}}
   .conv.weak{color:var(--bad);font-weight:700}
 
-  /* Actions panel */
-  .actions{padding:6px 4px}
-  .act{display:flex;gap:13px;padding:14px;border:1px solid var(--line);border-radius:11px;
-       margin-bottom:10px;background:var(--surface)}
-  .act .sev{flex:0 0 6px;border-radius:4px;align-self:stretch}
+  /* Actions */
+  .act{display:flex;gap:13px;padding:15px;border:1px solid var(--line);border-radius:13px;margin-bottom:11px;
+       background:var(--surface);box-shadow:var(--shadow)}
+  .act .sev{flex:0 0 5px;border-radius:4px;align-self:stretch}
   .act.bad .sev{background:var(--bad)}.act.warn .sev{background:var(--warn)}.act.ok .sev{background:var(--ok)}
   .act .body{flex:1;min-width:0}
-  .act .who{font-weight:700;font-size:13.5px;margin-bottom:4px}
-  .act .who .sp{color:var(--faint);font-weight:400;font-family:var(--mono);font-size:12px;margin-left:6px}
+  .act .who{font-weight:700;font-size:13.5px;margin-bottom:5px}
+  .act .who .sp{color:var(--faint);font-weight:400;font-family:var(--mono);font-size:12px;margin-left:7px}
   .act p{margin:3px 0;font-size:13px}
-  .act .arrow{color:var(--accent);font-weight:700}
-  .act .lab{font-weight:700;font-size:11.5px;text-transform:uppercase;letter-spacing:.03em}
+  .act .lab{font-weight:800;font-size:11px;text-transform:uppercase;letter-spacing:.04em;margin-right:5px}
   .act .lab.p{color:var(--bad)} .act .lab.a{color:var(--accent)} .act .lab.e{color:var(--good)}
 
   /* Table */
-  .tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}
-  table{border-collapse:collapse;width:100%;font-size:12.5px;min-width:880px}
-  th,td{padding:9px 11px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
-  th{position:sticky;top:0;background:var(--surface-2);font-size:11px;text-transform:uppercase;
-     letter-spacing:.03em;color:var(--muted);font-weight:700;cursor:pointer;user-select:none}
+  .tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);box-shadow:var(--shadow)}
+  table{border-collapse:collapse;width:100%;font-size:12.5px;min-width:900px}
+  th,td{padding:10px 12px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+  th{position:sticky;top:0;background:var(--surface-2);font-size:11px;text-transform:uppercase;letter-spacing:.03em;
+     color:var(--muted);font-weight:700;cursor:pointer;user-select:none;z-index:1}
   th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--surface);
-     max-width:230px;overflow:hidden;text-overflow:ellipsis}
+     max-width:240px;overflow:hidden;text-overflow:ellipsis}
   th:first-child{background:var(--surface-2)}
   tbody tr:hover td{background:var(--surface-2)}
   td.num{font-family:var(--mono)}
-  .chip{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:700;font-family:var(--ui)}
-  .chip.good{background:var(--good-bg);color:var(--good)}
-  .chip.ok{background:var(--ok-bg);color:var(--ok)}
-  .chip.warn{background:var(--warn-bg);color:var(--warn)}
-  .chip.bad{background:var(--bad-bg);color:var(--bad)}
-  .diag{font-size:11.5px;color:var(--muted);text-align:left;white-space:normal;max-width:260px}
+  .chip{display:inline-block;padding:2px 10px;border-radius:999px;font-size:11px;font-weight:700}
+  .chip.good{background:var(--good-bg);color:var(--good)} .chip.ok{background:var(--ok-bg);color:var(--ok)}
+  .chip.warn{background:var(--warn-bg);color:var(--warn)} .chip.bad{background:var(--bad-bg);color:var(--bad)}
+  .diag{font-size:11.5px;color:var(--muted);text-align:left;white-space:normal;max-width:280px}
   .hidden{display:none}
-  .note{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.55}
+  .note{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.55}
   .note code{background:var(--surface-2);padding:1px 5px;border-radius:5px;font-size:11.5px}
-  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-top:10px}
-  .legend b{font-family:var(--mono)}
-  .spinner{width:15px;height:15px;border:2px solid var(--line-strong);border-top-color:var(--accent);
-     border-radius:50%;display:inline-block;animation:spin .7s linear infinite;vertical-align:-2px;margin-right:7px}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-top:11px}
+  .spinner{width:15px;height:15px;border:2px solid var(--line-strong);border-top-color:var(--accent);border-radius:50%;
+     display:inline-block;animation:spin .7s linear infinite;vertical-align:-2px;margin-right:7px}
   @keyframes spin{to{transform:rotate(360deg)}}
   @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -144,11 +181,16 @@
 <body>
 <div class="wrap">
 
-  <header class="top">
-    <div class="brand">JPS <span>Ads Console</span></div>
-    <div class="tag">Meta Marketing API · đọc → chẩn đoán phễu → chấm điểm → đề xuất</div>
-    <div class="acct-pill" id="acctPill">chưa kết nối</div>
-  </header>
+  <div class="appbar">
+    <div class="logo">
+      <div class="mark">JPS</div>
+      <div><b>Ads Console</b><small>Meta Marketing API · diagnostic</small></div>
+    </div>
+    <div class="bar-right">
+      <span class="acct-pill" id="acctPill">chưa kết nối</span>
+      <button class="iconbtn" id="theme" title="Đổi giao diện sáng/tối">☾</button>
+    </div>
+  </div>
 
   <!-- CONFIG -->
   <div class="card config">
@@ -218,10 +260,8 @@
         </label>
       </div>
       <div class="grid g3" style="margin-top:14px">
-        <label class="fld">Graph API version
-          <input id="ver" value="v23.0" />
-        </label>
-        <label class="chk" style="align-self:end;padding-bottom:9px">
+        <label class="fld">Graph API version<input id="ver" value="v23.0" /></label>
+        <label class="chk" style="align-self:end;padding-bottom:10px">
           <input id="remember" type="checkbox" /> Nhớ token trong trình duyệt này
         </label>
       </div>
@@ -235,20 +275,40 @@
 
   <!-- RESULTS -->
   <div id="results" class="hidden">
+    <nav class="tabs" id="tabs">
+      <button data-t="secOverview" class="on">Tổng quan</button>
+      <button data-t="secTrend">Xu hướng</button>
+      <button data-t="secFunnel">Phễu</button>
+      <button data-t="secActions">Đề xuất</button>
+      <button data-t="secGroup">Theo nhóm</button>
+      <button data-t="secDetail">Chi tiết</button>
+    </nav>
 
-    <div class="section-h"><h2>Tổng quan tài khoản</h2><span class="sub" id="sumRange"></span></div>
+    <div class="section-h" id="secOverview"><h2 id="sumH">Tổng quan tài khoản</h2><span class="sub" id="sumRange"></span></div>
     <div class="cards" id="cards"></div>
 
-    <div class="section-h"><h2>Chẩn đoán phễu</h2><span class="sub">Mắt xích nào đang gãy</span></div>
+    <div class="section-h" id="secTrend"><h2>Xu hướng theo ngày</h2><span class="sub">Phát hiện đà tăng/giảm &amp; fatigue</span></div>
+    <div class="card trend" id="trendCard">
+      <div class="trend-insight" id="trendInsight"></div>
+      <div class="mchips" id="trendChips"></div>
+      <div class="chart-box"><div id="chart"></div><div class="chart-tip" id="chartTip"></div></div>
+    </div>
+
+    <div class="section-h" id="secFunnel"><h2>Chẩn đoán phễu</h2><span class="sub">Mắt xích nào đang gãy</span></div>
     <div class="card funnel" id="funnel"></div>
 
-    <div class="section-h"><h2>Đề xuất hành động</h2><span class="sub">Ưu tiên theo tác động (chi tiêu × mức độ)</span></div>
-    <div class="actions" id="actions"></div>
+    <div class="section-h" id="secActions"><h2>Đề xuất hành động</h2><span class="sub">Ưu tiên theo tác động</span></div>
+    <div id="actions"></div>
 
-    <div class="section-h">
-      <h2>Chấm điểm chi tiết</h2>
-      <span class="sub" id="tblLevel"></span>
-      <button class="btn ghost" id="csv" style="margin-left:auto;padding:7px 14px;font-size:12.5px">Xuất CSV</button>
+    <div class="section-h" id="secGroup"><h2>Phân tích theo nhóm</h2><span class="sub" id="groupCov"></span></div>
+    <div class="card" id="groupCard" style="padding:18px">
+      <div class="mchips" id="groupDims"></div>
+      <div class="tbl-wrap" style="box-shadow:none"><table id="gtbl"></table></div>
+    </div>
+
+    <div class="section-h" id="secDetail">
+      <h2 id="tblH">Chấm điểm chi tiết</h2><span class="sub" id="tblLevel"></span>
+      <button class="btn ghost" id="csv" style="margin-left:auto;padding:7px 15px;font-size:12.5px">Xuất CSV</button>
     </div>
     <div class="tbl-wrap"><table id="tbl"></table></div>
     <div class="legend">
@@ -258,392 +318,510 @@
       <span><span class="chip bad">Kém</span> &lt;40</span>
       <span>Trọng số: ROAS×3 · CPO×3 · CPM×1 (so nội bộ)</span>
     </div>
-    <p class="note">
-      Công cụ chỉ <b>đọc</b> dữ liệu, không bật/tắt hay chỉnh campaign. Mọi thay đổi anh tự thực hiện trong Ads Manager.
-      Ad set còn <i>học máy</i> (&lt;~50 đơn/tuần) được nới điểm vì dữ liệu chưa đủ tin cậy.
-    </p>
+    <p class="note">Công cụ chỉ <b>đọc</b> dữ liệu, không bật/tắt hay chỉnh campaign — mọi thay đổi anh tự làm trong Ads Manager.
+      Ad set còn <i>học máy</i> (&lt;~50 đơn/tuần) được nới điểm vì dữ liệu chưa đủ tin.</p>
   </div>
 </div>
 
 <script>
 "use strict";
 const $=id=>document.getElementById(id);
+let CUR='VND', ROWS=[], ACCOUNTS=[], SERIES=null, curMetric='roas';
+
 const F={
-  money:(n,c)=> (n==null||isNaN(n))?'—':new Intl.NumberFormat('vi-VN',{style:'currency',currency:c||'VND',maximumFractionDigits:c==='VND'?0:2}).format(n),
-  num:(n,d=0)=> (n==null||isNaN(n))?'—':new Intl.NumberFormat('vi-VN',{maximumFractionDigits:d}).format(n),
-  pct:(n,d=2)=> (n==null||isNaN(n))?'—':F.num(n,d)+'%',
-  x:(n,d=2)=> (n==null||isNaN(n))?'—':F.num(n,d)+'×'
+  money:(n,c)=>(n==null||isNaN(n))?'—':new Intl.NumberFormat('vi-VN',{style:'currency',currency:c||'VND',maximumFractionDigits:c==='VND'?0:2}).format(n),
+  num:(n,d=0)=>(n==null||isNaN(n))?'—':new Intl.NumberFormat('vi-VN',{maximumFractionDigits:d}).format(n),
+  pct:(n,d=2)=>(n==null||isNaN(n))?'—':F.num(n,d)+'%',
+  x:(n,d=2)=>(n==null||isNaN(n))?'—':F.num(n,d)+'×'
 };
-let CUR='VND', ROWS=[];
+const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const r2=n=>n==null||isNaN(n)?'':Math.round(n*100)/100;
+const q=s=>'"'+String(s).replace(/"/g,'""')+'"';
+const shortDate=s=>{if(!s)return'';const p=s.split('-');return p[2]+'/'+p[1];};
 
-/* ---------- preset → days, for learning-phase scaling ---------- */
+/* ---------- preset → days ---------- */
 const PRESET_DAYS={today:1,yesterday:1,last_7d:7,last_14d:14,last_30d:30,last_90d:90,this_month:new Date().getDate(),last_month:30,maximum:90};
-function rangeDays(){
-  const p=$('preset').value;
-  if(p==='custom'){const a=new Date($('since').value),b=new Date($('until').value);
-    const d=Math.round((b-a)/864e5)+1; return d>0?d:30;}
-  return PRESET_DAYS[p]||30;
-}
+function rangeDays(){const p=$('preset').value;
+  if(p==='custom'){const a=new Date($('since').value),b=new Date($('until').value);const d=Math.round((b-a)/864e5)+1;return d>0?d:30;}
+  return PRESET_DAYS[p]||30;}
+function presetLabel(){const o=$('preset');return o.options[o.selectedIndex].text;}
+function setStatus(t,err){const s=$('status');s.textContent=t;s.className='status'+(err?' err':'');}
 
-/* ---------- Meta action helpers ---------- */
+/* ---------- Meta helpers ---------- */
 const PURCH=['omni_purchase','purchase','offsite_conversion.fb_pixel_purchase','onsite_web_purchase'];
 const LEADS=['lead','offsite_conversion.fb_pixel_lead','onsite_conversion.lead_grouped','leadgen_grouped'];
-function av(arr,types){ if(!Array.isArray(arr))return 0;
-  for(const t of types){const f=arr.find(a=>a.action_type===t); if(f&&f.value!=null)return parseFloat(f.value)||0;} return 0;}
+function av(arr,types){if(!Array.isArray(arr))return 0;for(const t of types){const f=arr.find(a=>a.action_type===t);if(f&&f.value!=null)return parseFloat(f.value)||0;}return 0;}
 const belowAvg=r=>typeof r==='string'&&r.startsWith('below');
 
-/* ---------- build a normalized metric object from a raw insights row ---------- */
 function metrics(r){
-  const spend=+r.spend||0, impr=+r.impressions||0, reach=+r.reach||0, freq=+r.frequency||0;
+  const spend=+r.spend||0,impr=+r.impressions||0,reach=+r.reach||0,freq=+r.frequency||0;
   const linkClicks=+(r.inline_link_clicks||r.clicks)||0;
-  const ctr=+(r.inline_link_click_ctr||r.ctr)||0;
-  const cpc=+r.cpc||0, cpm=+r.cpm||0;
+  const ctr=+(r.inline_link_click_ctr||r.ctr)||0, cpc=+r.cpc||0, cpm=+r.cpm||0;
   const purch=av(r.actions,PURCH), revenue=av(r.action_values,PURCH);
   let roas=av(r.purchase_roas,PURCH); if(!roas&&spend>0&&revenue>0)roas=revenue/spend;
-  const leads=av(r.actions,LEADS);
-  const lpViews=av(r.actions,['landing_page_view']);
-  const cpo=purch>0?spend/purch:null;
-  const cpl=leads>0?spend/leads:null;
-  const cvr=linkClicks>0?purch/linkClicks*100:0;
-  const lpRate=linkClicks>0?lpViews/linkClicks*100:0;
-  return {name:r.campaign_name||r.adset_name||r.ad_name||'—',
-    objective:(r.objective||'').toUpperCase(),
+  const leads=av(r.actions,LEADS), lpViews=av(r.actions,['landing_page_view']);
+  const cpo=purch>0?spend/purch:null, cpl=leads>0?spend/leads:null;
+  const cvr=linkClicks>0?purch/linkClicks*100:0, lpRate=linkClicks>0?lpViews/linkClicks*100:0;
+  return {name:r.campaign_name||r.adset_name||r.ad_name||'—',objective:(r.objective||'').toUpperCase(),
     spend,impr,reach,freq,linkClicks,ctr,cpc,cpm,purch,revenue,roas,leads,lpViews,cpo,cpl,cvr,lpRate,
     qr:r.quality_ranking,er:r.engagement_rate_ranking,cr:r.conversion_rate_ranking};
 }
+function goalOf(m){const g=$('goal').value;if(g!=='auto')return g;const o=m.objective;
+  if(/SALES|CONVERSION|PURCHASE|CATALOG|PRODUCT/.test(o))return'sales';
+  if(/LEAD/.test(o))return'leads'; if(/TRAFFIC|LINK_CLICK/.test(o))return'traffic';
+  if(/AWARENESS|REACH|BRAND|VIDEO_VIEW|THRUPLAY/.test(o))return'awareness';
+  if(/ENGAGEMENT|POST|PAGE_LIKE|MESSAGE/.test(o))return'engagement'; return'sales';}
 
-/* ---------- map objective → goal bucket ---------- */
-function goalOf(m){
-  const g=$('goal').value; if(g!=='auto')return g;
-  const o=m.objective;
-  if(/SALES|CONVERSION|PURCHASE|CATALOG|PRODUCT/.test(o))return 'sales';
-  if(/LEAD/.test(o))return 'leads';
-  if(/TRAFFIC|LINK_CLICK/.test(o))return 'traffic';
-  if(/AWARENESS|REACH|BRAND|VIDEO_VIEW|THRUPLAY/.test(o))return 'awareness';
-  if(/ENGAGEMENT|POST|PAGE_LIKE|MESSAGE/.test(o))return 'engagement';
-  return 'sales';
-}
-
-/* ---------- scoring ---------- */
 const GRADES=[{min:80,label:'Tốt',cls:'good',rank:4},{min:60,label:'Khá',cls:'ok',rank:3},
               {min:40,label:'Cần cải thiện',cls:'warn',rank:2},{min:0,label:'Kém',cls:'bad',rank:1}];
 const gradeOf=s=>GRADES.find(g=>s>=g.min);
-const band=(v,a,b,c)=> v>=a?4 : v>=b?3 : v>=c?2 : 1;          // higher = better
-const bandRel=(v,med)=> med>0?(v<=0.8*med?4:v<=1.1*med?3:v<=1.4*med?2:1):3; // lower = better, vs median
+const band=(v,a,b,c)=>v>=a?4:v>=b?3:v>=c?2:1;
+const bandRel=(v,med)=>med>0?(v<=0.8*med?4:v<=1.1*med?3:v<=1.4*med?2:1):3;
 
 function score(m,ctx){
-  const be=ctx.breakeven, days=ctx.days, goal=goalOf(m);
-  const tCPO=ctx.targetCPO, stop=ctx.stoploss;
-  let parts=[], notes=[];
-
-  if(goal==='sales'){
-    const rRoas=m.roas?band(m.roas,1.3*be,be,0.7*be):1;
-    parts.push([rRoas,3]);
-    if(tCPO){ const rCpo=m.cpo!=null?band(-(m.cpo),-(0.8*tCPO),-(tCPO),-(1.3*tCPO)):1; parts.push([rCpo,3]); }
+  const be=ctx.breakeven,days=ctx.days,goal=goalOf(m),tCPO=ctx.targetCPO,stop=ctx.stoploss;
+  let parts=[],notes=[];
+  if(goal==='sales'){parts.push([m.roas?band(m.roas,1.3*be,be,0.7*be):1,3]);
+    if(tCPO)parts.push([m.cpo!=null?band(-(m.cpo),-(0.8*tCPO),-(tCPO),-(1.3*tCPO)):1,3]);
     parts.push([bandRel(m.cpm,ctx.medCPM),1]);
   }else if(goal==='leads'){
-    if(tCPO){const r=m.cpl!=null?band(-(m.cpl),-(0.8*tCPO),-(tCPO),-(1.3*tCPO)):1;parts.push([r,3]);}
+    if(tCPO)parts.push([m.cpl!=null?band(-(m.cpl),-(0.8*tCPO),-(tCPO),-(1.3*tCPO)):1,3]);
     else parts.push([bandRel(m.cpl||1e12,ctx.medCPL),3]);
     parts.push([band(m.ctr,1.5,0.8,0.5),1]);
-  }else if(goal==='traffic'){
-    parts.push([band(m.ctr,1.5,0.8,0.5),3]);
-    parts.push([bandRel(m.cpc,ctx.medCPC),2]);
-  }else if(goal==='awareness'){
-    parts.push([bandRel(m.cpm,ctx.medCPM),3]);
-    parts.push([band(-(m.freq),-(3),-(4),-(5)),2]); // freq ideal ≤3
-  }else{ parts.push([bandRel(m.cpm,ctx.medCPM),1]); }
-
-  const wsum=parts.reduce((s,[v,w])=>s+v*w,0), wmax=parts.reduce((s,[,w])=>s+4*w,0);
-  let pct=Math.round(wsum/wmax*100);
-  let g=gradeOf(pct);
-
-  // learning gate (sales/leads)
-  const weekly=(goal==='sales'?m.purch:goal==='leads'?m.leads:m.purch)/(days/7);
+  }else if(goal==='traffic'){parts.push([band(m.ctr,1.5,0.8,0.5),3]);parts.push([bandRel(m.cpc,ctx.medCPC),2]);
+  }else if(goal==='awareness'){parts.push([bandRel(m.cpm,ctx.medCPM),3]);parts.push([band(-(m.freq),-3,-4,-5),2]);
+  }else parts.push([bandRel(m.cpm,ctx.medCPM),1]);
+  const wsum=parts.reduce((s,[v,w])=>s+v*w,0),wmax=parts.reduce((s,[,w])=>s+4*w,0);
+  let pct=Math.round(wsum/wmax*100),g=gradeOf(pct);
+  const weekly=(goal==='leads'?m.leads:m.purch)/(days/7);
   const learning=(goal==='sales'||goal==='leads')&&weekly<50;
-  // stop-loss
-  const stopSpend = stop || (tCPO?tCPO*3:Infinity);
-  const stopLoss = goal==='sales' && m.purch===0 && m.spend>=stopSpend;
-
-  if(stopLoss){ g=GRADES[3]; notes.push('DỪNG (stop-loss): chi '+F.money(m.spend,CUR)+' chưa ra đơn'); }
-  else if(learning && g.rank===1){ pct=Math.max(pct,40); g=GRADES.find(x=>x.label==='Cần cải thiện'); notes.push('đang học máy, dữ liệu chưa đủ tin'); }
-  else if(learning){ notes.push('học máy ('+F.num(weekly,0)+' đơn/tuần quy đổi)'); }
-
+  const stopSpend=stop||(tCPO?tCPO*3:Infinity);
+  const stopLoss=goal==='sales'&&m.purch===0&&m.spend>=stopSpend;
+  if(stopLoss){g=GRADES[3];notes.push('DỪNG (stop-loss): chi '+F.money(m.spend,CUR)+' chưa ra đơn');}
+  else if(learning&&g.rank===1){pct=Math.max(pct,40);g=GRADES.find(x=>x.label==='Cần cải thiện');notes.push('đang học máy, dữ liệu chưa đủ tin');}
+  else if(learning){notes.push('học máy ('+F.num(weekly,0)+' đơn/tuần quy đổi)');}
   return {goal,pct,grade:g,learning,stopLoss,notes};
 }
 
-/* ---------- funnel diagnosis (symptom tree from skill) ---------- */
 function diagnose(m,ctx){
-  // returns {link, severity 0-3, text, action, expect}
-  const ctrLow=m.ctr>0&&m.ctr<0.8, cvrLow=m.cvr<1&&m.linkClicks>=30;
-  const freqHigh=m.freq>3.5;
-  const cpmHigh = ctx.medCPM>0 && m.cpm>1.4*ctx.medCPM;
-  if(m.linkClicks<30 && m.purch<10){
-    return {link:'Dữ liệu',severity:1,
-      text:'Mẫu nhỏ ('+F.num(m.linkClicks)+' click) — chưa đủ để kết luận.',
-      action:'Gom ngân sách / nới tệp để đủ tín hiệu, chờ thêm dữ liệu.',
-      expect:'Đủ ~50 chuyển đổi/tuần để số liệu đáng tin.'};
-  }
-  if(freqHigh){
-    return {link:'Tần suất',severity:2,
-      text:'Frequency '+F.num(m.freq,1)+' (>3.5) → audience fatigue, cùng nhóm thấy quá nhiều.',
-      action:'Làm mới creative, mở rộng/đổi tệp (lookalike mới), loại trừ người đã mua.',
-      expect:'CTR phục hồi, CPM/CPO hạ trở lại.'};
-  }
-  if(cpmHigh || belowAvg(m.qr)){
-    return {link:'Hiển thị (CPM)',severity:2,
-      text:'CPM '+F.money(m.cpm,CUR)+(cpmHigh?' cao hơn ~40% trung vị tài khoản':' kèm Quality ranking thấp')+' → đấu giá đắt / relevance thấp.',
-      action:'Nới targeting hoặc dùng Advantage+ audience; cải thiện chất lượng creative để tăng relevance.',
-      expect:'CPM giảm, chi phí phễu đầu vào rẻ hơn.'};
-  }
-  if(ctrLow || belowAvg(m.er)){
-    return {link:'Click (CTR)',severity:2,
-      text:'CTR '+F.pct(m.ctr)+' (<0.8%)'+(m.cpm&&ctx.medCPM&&m.cpm<=1.1*ctx.medCPM?' trong khi CPM bình thường':'')+' → creative/thông điệp chưa hút hoặc sai tệp.',
-      action:'Test hook 3 giây đầu video, đổi hình/headline, thử 2–3 góc tiếp cận mới; kiểm tra tệp có đúng người mua.',
-      expect:'CTR lên 1%+, CPC giảm.'};
-  }
-  if(cvrLow || belowAvg(m.cr)){
-    return {link:'Sau click (CVR)',severity:3,
-      text:'CTR ổn nhưng CVR '+F.pct(m.cvr)+' (<1%)'+(m.lpRate&&m.lpRate<70?'; landing/click chỉ '+F.pct(m.lpRate,0)+' → trang tải chậm':'')+' → vấn đề landing/offer/trust.',
-      action:'Tối ưu tốc độ trang, đồng bộ thông điệp ad–landing, rút gọn form/thanh toán, thêm review/bảo hành, test ưu đãi.',
-      expect:'CVR vượt 1–3%, CPO giảm.'};
-  }
-  if(m.roas&&m.roas<ctx.breakeven && m.cvr>=1){
-    return {link:'Giá trị đơn',severity:2,
-      text:'Có chuyển đổi nhưng ROAS '+F.x(m.roas)+' < hòa vốn '+F.x(ctx.breakeven)+' → giá trị đơn thấp / sai tệp giá trị.',
-      action:'Đẩy upsell–bundle tăng AOV, nhắm tệp giá trị cao hơn, xem lại attribution window.',
-      expect:'ROAS vượt ngưỡng hòa vốn.'};
-  }
-  return {link:'Khỏe',severity:0,
-    text:'Các mắt xích phễu trong ngưỡng tốt.',
-    action:'Giữ nguyên cấu trúc, cân nhắc scale ngân sách từ từ (20–30%/lần).',
-    expect:'Duy trì hiệu quả khi tăng quy mô.'};
+  const ctrLow=m.ctr>0&&m.ctr<0.8,cvrLow=m.cvr<1&&m.linkClicks>=30,freqHigh=m.freq>3.5;
+  const cpmHigh=ctx.medCPM>0&&m.cpm>1.4*ctx.medCPM;
+  if(m.linkClicks<30&&m.purch<10)return{link:'Dữ liệu',severity:1,
+    text:'Mẫu nhỏ ('+F.num(m.linkClicks)+' click) — chưa đủ để kết luận.',
+    action:'Gom ngân sách / nới tệp để đủ tín hiệu, chờ thêm dữ liệu.',expect:'Đủ ~50 chuyển đổi/tuần để số liệu đáng tin.'};
+  if(freqHigh)return{link:'Tần suất',severity:2,
+    text:'Frequency '+F.num(m.freq,1)+' (>3.5) → audience fatigue.',
+    action:'Làm mới creative, mở rộng/đổi tệp (lookalike mới), loại trừ người đã mua.',expect:'CTR phục hồi, CPM/CPO hạ.'};
+  if(cpmHigh||belowAvg(m.qr))return{link:'Hiển thị (CPM)',severity:2,
+    text:'CPM '+F.money(m.cpm,CUR)+(cpmHigh?' cao hơn ~40% trung vị tài khoản':' kèm Quality ranking thấp')+' → đấu giá đắt / relevance thấp.',
+    action:'Nới targeting hoặc Advantage+ audience; cải thiện chất lượng creative.',expect:'CPM giảm.'};
+  if(ctrLow||belowAvg(m.er))return{link:'Click (CTR)',severity:2,
+    text:'CTR '+F.pct(m.ctr)+' (<0.8%)'+(m.cpm&&ctx.medCPM&&m.cpm<=1.1*ctx.medCPM?' trong khi CPM bình thường':'')+' → creative chưa hút hoặc sai tệp.',
+    action:'Test hook 3 giây đầu video, đổi hình/headline, thử 2–3 góc tiếp cận; kiểm tra tệp.',expect:'CTR lên 1%+, CPC giảm.'};
+  if(cvrLow||belowAvg(m.cr))return{link:'Sau click (CVR)',severity:3,
+    text:'CTR ổn nhưng CVR '+F.pct(m.cvr)+' (<1%)'+(m.lpRate&&m.lpRate<70?'; landing/click '+F.pct(m.lpRate,0)+' → trang chậm':'')+' → vấn đề landing/offer/trust.',
+    action:'Tối ưu tốc độ trang, đồng bộ ad–landing, rút gọn form, thêm review/bảo hành, test ưu đãi.',expect:'CVR vượt 1–3%, CPO giảm.'};
+  if(m.roas&&m.roas<ctx.breakeven&&m.cvr>=1)return{link:'Giá trị đơn',severity:2,
+    text:'Có đơn nhưng ROAS '+F.x(m.roas)+' < hòa vốn '+F.x(ctx.breakeven)+' → giá trị đơn thấp / sai tệp.',
+    action:'Đẩy upsell–bundle tăng AOV, nhắm tệp giá trị cao hơn, xem lại attribution.',expect:'ROAS vượt hòa vốn.'};
+  return{link:'Khỏe',severity:0,text:'Các mắt xích phễu trong ngưỡng tốt.',
+    action:'Giữ cấu trúc, cân nhắc scale ngân sách 20–30%/lần.',expect:'Duy trì hiệu quả khi tăng quy mô.'};
 }
 
 /* ---------- API ---------- */
 function fieldsFor(level){
-  const base=['spend','impressions','reach','frequency','clicks','inline_link_clicks',
-    'ctr','inline_link_click_ctr','cpc','cpm','actions','action_values','cost_per_action_type',
-    'purchase_roas','objective'];
-  if(level==='campaign')base.push('campaign_name');
-  if(level==='adset')base.push('campaign_name','adset_name');
-  if(level==='ad')base.push('campaign_name','adset_name','ad_name','quality_ranking','engagement_rate_ranking','conversion_rate_ranking');
-  return base.join(',');
+  const b=['spend','impressions','reach','frequency','clicks','inline_link_clicks','ctr','inline_link_click_ctr',
+    'cpc','cpm','actions','action_values','cost_per_action_type','purchase_roas','objective'];
+  if(level==='campaign')b.push('campaign_name');
+  if(level==='adset')b.push('campaign_name','adset_name');
+  if(level==='ad')b.push('campaign_name','adset_name','ad_name','quality_ranking','engagement_rate_ranking','conversion_rate_ranking');
+  return b.join(',');
 }
-function timeParam(){
-  const p=$('preset').value;
-  if(p==='custom')return "&time_range="+encodeURIComponent(JSON.stringify({since:$('since').value,until:$('until').value}));
-  return "&date_preset="+p;
+function timeParam(){const p=$('preset').value;
+  if(p==='custom')return"&time_range="+encodeURIComponent(JSON.stringify({since:$('since').value,until:$('until').value}));
+  return"&date_preset="+p;}
+async function gget(url){const r=await fetch(url);const j=await r.json();
+  if(j.error){const e=j.error;throw new Error(e.error_user_msg||e.message||'Lỗi API');}return j;}
+async function fetchAll(base){let url=base+"&limit=200",out=[],g=0;
+  while(url&&g++<25){const j=await gget(url);out=out.concat(j.data||[]);url=j.paging&&j.paging.next?j.paging.next:null;}return out;}
+
+/* ---------- daily series ---------- */
+async function fetchDaily(G,actId,token){
+  const f=['spend','impressions','inline_link_clicks','clicks','inline_link_click_ctr','ctr','cpm','frequency','actions','action_values','purchase_roas'].join(',');
+  const rows=await fetchAll(G+actId+'/insights?level=account&time_increment=1&fields='+f+timeParam()+'&access_token='+encodeURIComponent(token));
+  rows.sort((a,b)=>(a.date_start||'').localeCompare(b.date_start||''));
+  const s={dates:[],spend:[],roas:[],purch:[],ctr:[],cpm:[],cpo:[],freq:[]};
+  rows.forEach(r=>{const m=metrics(r);s.dates.push(r.date_start);s.spend.push(m.spend);s.roas.push(m.roas||null);
+    s.purch.push(m.purch);s.ctr.push(m.ctr||null);s.cpm.push(m.cpm||null);s.cpo.push(m.cpo);s.freq.push(m.freq||null);});
+  return s;
 }
-async function gget(url){
-  const r=await fetch(url); const j=await r.json();
-  if(j.error){const e=j.error; throw new Error(e.error_user_msg||e.message||'Lỗi API');}
-  return j;
+const METRICS={
+  spend:{label:'Chi tiêu',fmt:v=>F.money(v,CUR),color:'var(--accent)'},
+  roas:{label:'ROAS',fmt:v=>F.x(v),color:'var(--good)'},
+  purch:{label:'Đơn',fmt:v=>F.num(v),color:'var(--accent)'},
+  ctr:{label:'CTR',fmt:v=>F.pct(v),color:'var(--ok)'},
+  cpm:{label:'CPM',fmt:v=>F.money(v,CUR),color:'var(--warn)'},
+  cpo:{label:'CPO',fmt:v=>v!=null?F.money(v,CUR):'—',color:'var(--bad)'}
+};
+function trendInsight(s){
+  if(s.dates.length<6)return'<span class="ti-muted">Cần ≥6 ngày dữ liệu để phân tích xu hướng.</span>';
+  const half=Math.floor(s.dates.length/2);
+  const mean=(arr,a,b)=>{const x=arr.slice(a,b).filter(v=>v!=null&&!isNaN(v));return x.length?x.reduce((p,c)=>p+c,0)/x.length:null;};
+  const r1=mean(s.roas,0,half),r2=mean(s.roas,half),c1=mean(s.ctr,0,half),c2=mean(s.ctr,half),f1=mean(s.freq,0,half),f2=mean(s.freq,half);
+  const dR=r1?(r2-r1)/r1*100:0,dC=c1?(c2-c1)/c1*100:0,dF=f1?(f2-f1)/f1*100:0;
+  const ar=v=>v>=0?'▲':'▼';
+  let v;
+  if(dR<-10&&(dC<-5||dF>10))v='<b class="bad">Dấu hiệu fatigue:</b> ROAS nửa cuối giảm '+Math.abs(dR).toFixed(0)+'%'+(dC<-5?', CTR giảm '+Math.abs(dC).toFixed(0)+'%':'')+(dF>10?', tần suất tăng '+dF.toFixed(0)+'%':'')+' → cân nhắc làm mới creative / đổi tệp.';
+  else if(dR>10)v='<b class="good">Đang lên:</b> ROAS nửa cuối tăng '+dR.toFixed(0)+'% → cân nhắc scale ngân sách từ từ.';
+  else v='<b>Ổn định:</b> ROAS dao động '+(dR>=0?'+':'')+dR.toFixed(0)+'% giữa hai nửa kỳ.';
+  return v+'<span class="ti-d">ROAS '+ar(dR)+Math.abs(dR).toFixed(0)+'% · CTR '+ar(dC)+Math.abs(dC).toFixed(0)+'% · Freq '+ar(dF)+Math.abs(dF).toFixed(0)+'%</span>';
 }
-async function fetchAll(base){
-  let url=base+"&limit=200", out=[], guard=0;
-  while(url&&guard++<25){ const j=await gget(url); out=out.concat(j.data||[]);
-    url=j.paging&&j.paging.next?j.paging.next:null; }
-  return out;
+function renderTrend(series){
+  SERIES=series;
+  $('trendInsight').innerHTML=trendInsight(series);
+  $('trendChips').innerHTML=Object.keys(METRICS).map(k=>'<button class="mchip'+(k===curMetric?' on':'')+'" data-m="'+k+'">'+METRICS[k].label+'</button>').join('');
+  $('trendChips').querySelectorAll('.mchip').forEach(b=>b.onclick=()=>{curMetric=b.dataset.m;renderTrend(series);});
+  drawChart(series,curMetric);
+}
+function drawChart(series,key){
+  const m=METRICS[key],dates=series.dates,raw=series[key],n=dates.length;
+  const idx=[];raw.forEach((v,i)=>{if(v!=null&&!isNaN(v))idx.push(i);});
+  if(idx.length<2){$('chart').innerHTML='<div class="empty">Chưa đủ dữ liệu theo ngày.</div>';return;}
+  const W=720,H=250,pl=8,pr=14,pt=14,pb=24;
+  const vals=idx.map(i=>raw[i]); let mn=Math.min(...vals),mx=Math.max(...vals);
+  if(mn===mx){mn=mn*0.9;mx=mx*1.1||1;} const pad=(mx-mn)*0.12;mn-=pad;if(key!=='roas'&&mn<0)mn=0;mx+=pad;
+  const X=i=>pl+i*(W-pl-pr)/(n-1),Y=v=>pt+(1-(v-mn)/(mx-mn))*(H-pt-pb);
+  let grid='',lab='';
+  for(let g=0;g<=3;g++){const v=mn+(mx-mn)*g/3,y=Y(v);
+    grid+='<line class="grid" x1="'+pl+'" y1="'+y.toFixed(1)+'" x2="'+(W-pr)+'" y2="'+y.toFixed(1)+'"/>';
+    lab+='<text class="yl" x="'+(W-pr)+'" y="'+(y-3).toFixed(1)+'">'+m.fmt(v)+'</text>';}
+  let d='',st=false; raw.forEach((v,i)=>{if(v==null||isNaN(v)){st=false;return;}d+=(st?' L':' M')+X(i).toFixed(1)+','+Y(v).toFixed(1);st=true;});
+  const f=idx[0],l=idx[idx.length-1]; let area='M'+X(f).toFixed(1)+','+(H-pb);
+  raw.forEach((v,i)=>{if(v==null||isNaN(v))return;area+=' L'+X(i).toFixed(1)+','+Y(v).toFixed(1);}); area+=' L'+X(l).toFixed(1)+','+(H-pb)+' Z';
+  const xi=[0,Math.floor((n-1)/2),n-1];
+  const xl=xi.map(i=>'<text class="xl" x="'+X(i).toFixed(1)+'" y="'+(H-7)+'" text-anchor="'+(i===0?'start':i===n-1?'end':'middle')+'">'+shortDate(dates[i])+'</text>').join('');
+  const dots=idx.map(i=>'<circle cx="'+X(i).toFixed(1)+'" cy="'+Y(raw[i]).toFixed(1)+'" r="2.2" style="fill:'+m.color+'"/>').join('');
+  $('chart').innerHTML='<svg viewBox="0 0 '+W+' '+H+'">'+grid+'<path d="'+area+'" style="fill:'+m.color+'" opacity="0.10"/>'+
+    '<path d="'+d+'" fill="none" style="stroke:'+m.color+'" stroke-width="2" stroke-linejoin="round"/>'+dots+lab+xl+'</svg>';
+  const svg=$('chart').querySelector('svg'),tip=$('chartTip');
+  svg.addEventListener('mousemove',ev=>{const r=svg.getBoundingClientRect();const px=(ev.clientX-r.left)/r.width*W;
+    let i=Math.round((px-pl)/((W-pl-pr)/(n-1)));i=Math.max(0,Math.min(n-1,i));
+    if(raw[i]==null){tip.style.display='none';return;}
+    tip.style.display='block';tip.style.left=(X(i)/W*r.width)+'px';tip.style.top=(Y(raw[i])/H*r.height)+'px';
+    tip.innerHTML='<b>'+m.fmt(raw[i])+'</b><span>'+shortDate(dates[i])+'</span>';});
+  svg.addEventListener('mouseleave',()=>tip.style.display='none');
+}
+function spark(vals,color){
+  vals=vals.filter(v=>v!=null&&!isNaN(v)); if(vals.length<2)return'';
+  const w=120,h=34,p=3,mn=Math.min(...vals),mx=Math.max(...vals),rng=mx-mn||1;
+  const X=i=>p+i*(w-2*p)/(vals.length-1),Y=v=>h-p-((v-mn)/rng)*(h-2*p);
+  const pts=vals.map((v,i)=>X(i).toFixed(1)+','+Y(v).toFixed(1));
+  return'<svg class="spark" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none">'+
+    '<path d="M'+X(0).toFixed(1)+','+(h-p)+' L'+pts.join(' L')+' L'+X(vals.length-1).toFixed(1)+','+(h-p)+' Z" style="fill:'+color+'" opacity="0.13"/>'+
+    '<path d="M'+pts.join(' L')+'" fill="none" style="stroke:'+color+'" stroke-width="1.5"/>'+
+    '<circle cx="'+X(vals.length-1).toFixed(1)+'" cy="'+Y(vals[vals.length-1]).toFixed(1)+'" r="2" style="fill:'+color+'"/></svg>';
 }
 
-/* ---------- render ---------- */
-function cardCls(v,goal){return ''} // placeholder hook
-function renderCards(a,ctx){
-  const c=$('cards'); c.innerHTML='';
+/* ---------- tabs / layout ---------- */
+function toggleSection(headerId,cardEl,show){
+  const h=$(headerId);if(h)h.style.display=show?'':'none';
+  if(cardEl)cardEl.style.display=show?'':'none';
+  const b=document.querySelector('#tabs button[data-t="'+headerId+'"]');if(b)b.style.display=show?'':'none';
+}
+function setActiveTab(id){document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===id));}
+function resetSingleLayout(){$('sumH').textContent='Tổng quan tài khoản';$('tblH').textContent='Chấm điểm chi tiết';
+  toggleSection('secFunnel',$('funnel'),true);}
+
+/* ---------- render single ---------- */
+function renderCards(a,ctx,series){
+  const c=$('cards');c.innerHTML='';
   const roasCls=a.roas>=ctx.breakeven?'good':a.roas>=0.7*ctx.breakeven?'warn':'bad';
+  const sp=series||{};
   const items=[
-    ['Chi tiêu',F.money(a.spend,CUR),''],
-    ['Doanh thu',F.money(a.revenue,CUR),a.purch+' đơn'],
-    ['ROAS',F.x(a.roas),'hòa vốn '+F.x(ctx.breakeven),roasCls],
-    ['CPO',a.cpo!=null?F.money(a.cpo,CUR):'—',''],
-    ['CTR (link)',F.pct(a.ctr),''],
-    ['CPC',F.money(a.cpc,CUR),''],
-    ['CPM',F.money(a.cpm,CUR),''],
-    ['Frequency',F.num(a.freq,2),a.freq>3.5?'⚠ fatigue':'']
+    ['Chi tiêu',F.money(a.spend,CUR),'',null,spark(sp.spend||[],'var(--accent)')],
+    ['Doanh thu',F.money(a.revenue,CUR),a.purch+' đơn',null,spark((sp.spend||[]).map((_,i)=>(sp.roas&&sp.roas[i]!=null&&sp.spend?sp.spend[i]*sp.roas[i]:null)),'var(--good)')],
+    ['ROAS',F.x(a.roas),'hòa vốn '+F.x(ctx.breakeven),roasCls,spark(sp.roas||[],'var(--good)')],
+    ['CPO',a.cpo!=null?F.money(a.cpo,CUR):'—','',null,spark(sp.cpo||[],'var(--bad)')],
+    ['CTR (link)',F.pct(a.ctr),'',null,spark(sp.ctr||[],'var(--ok)')],
+    ['CPC',F.money(a.cpc,CUR),'',null,''],
+    ['CPM',F.money(a.cpm,CUR),'',null,spark(sp.cpm||[],'var(--warn)')],
+    ['Frequency',F.num(a.freq,2),a.freq>3.5?'⚠ fatigue':'',a.freq>3.5?'warn':null,spark(sp.freq||[],'var(--warn)')]
   ];
-  items.forEach(([k,v,d,cls],i)=>{
-    const el=document.createElement('div'); el.className='sc'; el.style.animationDelay=(i*40)+'ms';
-    el.innerHTML='<div class="k">'+k+'</div><div class="v '+(cls||'')+'">'+v+'</div><div class="d">'+(d||'&nbsp;')+'</div>';
-    c.appendChild(el);
-  });
+  items.forEach(([k,v,d,cls,sk],i)=>{const el=document.createElement('div');el.className='sc';el.style.animationDelay=(i*40)+'ms';
+    el.innerHTML='<div class="k">'+k+'</div><div class="v '+(cls||'')+'">'+v+'</div><div class="d">'+(d||'&nbsp;')+'</div>'+(sk||'');
+    c.appendChild(el);});
 }
 function renderFunnel(a,ctx){
-  const stages=[
-    ['Hiển thị',a.impr,null],
-    ['Click link',a.linkClicks, a.impr>0?a.linkClicks/a.impr*100:0],
-    ['Xem landing',a.lpViews, a.linkClicks>0?a.lpViews/a.linkClicks*100:0],
-    ['Mua hàng',a.purch, a.linkClicks>0?a.purch/a.linkClicks*100:0]
-  ];
+  const stages=[['Hiển thị',a.impr,null],['Click link',a.linkClicks,a.impr>0?a.linkClicks/a.impr*100:0],
+    ['Xem landing',a.lpViews,a.linkClicks>0?a.lpViews/a.linkClicks*100:0],['Mua hàng',a.purch,a.linkClicks>0?a.purch/a.linkClicks*100:0]];
   const d=diagnose(a,ctx);
   const weakIdx={'Click (CTR)':1,'Sau click (CVR)':3,'Hiển thị (CPM)':0,'Tần suất':1}[d.link];
   const max=stages[0][1]||1;
   let html='<div class="verdict"><b>Mắt xích yếu nhất: '+d.link+'.</b> '+d.text+'</div>';
-  stages.forEach((s,i)=>{
-    const w=Math.max(max>0?s[1]/max*100:0, s[1]>0?1.5:0);
-    const weak=i===weakIdx;
-    html+='<div class="stage'+(weak?' weak':'')+'"><div class="lbl">'+s[0]+
-      '<small>'+F.num(s[1])+'</small></div>'+
-      '<div class="bar-track"><div class="bar-fill" data-w="'+w.toFixed(2)+'"></div></div>'+
-      '<div class="stage-num">'+(i===0?'100%':'')+'</div></div>';
-    if(s[2]!=null&&i>0){
-      const cw=(d.link==='Click (CTR)'&&i===1)||(d.link==='Sau click (CVR)'&&i===3);
-      html+='<div class="conv'+(cw?' weak':'')+'">↳ tỉ lệ '+F.pct(s[2],2)+' so với bước trước</div>';
-    }
-  });
+  stages.forEach((s,i)=>{const w=Math.max(max>0?s[1]/max*100:0,s[1]>0?1.5:0),weak=i===weakIdx;
+    html+='<div class="stage'+(weak?' weak':'')+'"><div class="lbl">'+s[0]+'<small>'+F.num(s[1])+'</small></div>'+
+      '<div class="bar-track"><div class="bar-fill" data-w="'+w.toFixed(2)+'"></div></div><div class="stage-num">'+(i===0?'100%':'')+'</div></div>';
+    if(s[2]!=null&&i>0){const cw=(d.link==='Click (CTR)'&&i===1)||(d.link==='Sau click (CVR)'&&i===3);
+      html+='<div class="conv'+(cw?' weak':'')+'">↳ tỉ lệ '+F.pct(s[2],2)+' so với bước trước</div>';}});
   $('funnel').innerHTML=html;
   requestAnimationFrame(()=>$('funnel').querySelectorAll('.bar-fill').forEach(b=>b.style.width=b.dataset.w+'%'));
 }
 function renderActions(scored,ctx){
-  const list=scored.filter(x=>x.s.grade.rank<=2)
-    .map(x=>({...x,d:diagnose(x.m,ctx)}))
-    .sort((p,q)=> (q.d.severity-p.d.severity)||(q.m.spend-p.m.spend))
-    .slice(0,6);
+  const list=scored.filter(x=>x.s.grade.rank<=2).map(x=>({...x,d:diagnose(x.m,ctx)}))
+    .sort((p,q)=>(q.d.severity-p.d.severity)||(q.m.spend-p.m.spend)).slice(0,6);
   const el=$('actions');
   if(!list.length){el.innerHTML='<div class="act ok"><div class="sev"></div><div class="body"><div class="who">Không có cảnh báo lớn 🎉</div><p>Các đơn vị đều ở mức Khá trở lên trong kỳ này.</p></div></div>';return;}
-  el.innerHTML=list.map(x=>{
-    const sev=x.d.severity>=3?'bad':x.d.severity>=2?'warn':'ok';
-    return '<div class="act '+sev+'"><div class="sev"></div><div class="body">'+
+  el.innerHTML=list.map(x=>{const sev=x.d.severity>=3?'bad':x.d.severity>=2?'warn':'ok';
+    return'<div class="act '+sev+'"><div class="sev"></div><div class="body">'+
       '<div class="who">'+esc(x.m.name)+'<span class="sp">'+F.money(x.m.spend,CUR)+' · '+x.s.grade.label+'</span></div>'+
-      '<p><span class="lab p">Vấn đề</span> '+x.d.text+'</p>'+
-      '<p><span class="lab a">Hành động</span> '+x.d.action+'</p>'+
-      '<p><span class="lab e">Kỳ vọng</span> '+x.d.expect+'</p>'+
-      '</div></div>';
-  }).join('');
+      '<p><span class="lab p">Vấn đề</span>'+x.d.text+'</p><p><span class="lab a">Hành động</span>'+x.d.action+'</p>'+
+      '<p><span class="lab e">Kỳ vọng</span>'+x.d.expect+'</p></div></div>';}).join('');
 }
-function esc(s){return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
-
-let sortKey='spend', sortDir=-1;
+let sortKey='spend',sortDir=-1;
 function renderTable(scored,ctx){
-  const cols=[['name','Tên'],['spend','Chi tiêu'],['roas','ROAS'],['cpo','CPO'],['purch','Đơn'],
-    ['ctr','CTR'],['cpc','CPC'],['cpm','CPM'],['freq','Freq'],['pct','Điểm'],['grade','Xếp hạng'],['diag','Chẩn đoán']];
+  const cols=[['name','Tên'],['spend','Chi tiêu'],['roas','ROAS'],['cpo','CPO'],['purch','Đơn'],['ctr','CTR'],
+    ['cpc','CPC'],['cpm','CPM'],['freq','Freq'],['pct','Điểm'],['grade','Xếp hạng'],['diag','Chẩn đoán']];
   const rows=scored.map(x=>({...x,d:diagnose(x.m,ctx)}));
-  rows.sort((a,b)=>{
-    let av,bv;
+  rows.sort((a,b)=>{let av,bv;
     if(sortKey==='pct'||sortKey==='grade'){av=a.s.pct;bv=b.s.pct;}
     else if(sortKey==='diag'){av=a.d.severity;bv=b.d.severity;}
-    else if(sortKey==='name'){return sortDir*String(a.m.name).localeCompare(b.m.name);}
-    else{av=a.m[sortKey]??-1;bv=b.m[sortKey]??-1;}
-    return sortDir*((av>bv)-(av<bv));
-  });
+    else if(sortKey==='name')return sortDir*String(a.m.name).localeCompare(b.m.name);
+    else{av=a.m[sortKey]??-1;bv=b.m[sortKey]??-1;}return sortDir*((av>bv)-(av<bv));});
   let h='<thead><tr>'+cols.map(c=>'<th data-k="'+c[0]+'">'+c[1]+(sortKey===c[0]?(sortDir<0?' ↓':' ↑'):'')+'</th>').join('')+'</tr></thead><tbody>';
   rows.forEach(x=>{const m=x.m,s=x.s;
-    h+='<tr><td title="'+esc(m.name)+'">'+esc(m.name)+'</td>'+
-      '<td class="num">'+F.money(m.spend,CUR)+'</td>'+
-      '<td class="num">'+F.x(m.roas)+'</td>'+
-      '<td class="num">'+(m.cpo!=null?F.money(m.cpo,CUR):'—')+'</td>'+
-      '<td class="num">'+F.num(m.purch)+'</td>'+
-      '<td class="num">'+F.pct(m.ctr)+'</td>'+
-      '<td class="num">'+F.money(m.cpc,CUR)+'</td>'+
-      '<td class="num">'+F.money(m.cpm,CUR)+'</td>'+
-      '<td class="num">'+F.num(m.freq,2)+'</td>'+
-      '<td class="num">'+s.pct+'</td>'+
+    h+='<tr><td title="'+esc(m.name)+'">'+esc(m.name)+'</td><td class="num">'+F.money(m.spend,CUR)+'</td>'+
+      '<td class="num">'+F.x(m.roas)+'</td><td class="num">'+(m.cpo!=null?F.money(m.cpo,CUR):'—')+'</td>'+
+      '<td class="num">'+F.num(m.purch)+'</td><td class="num">'+F.pct(m.ctr)+'</td><td class="num">'+F.money(m.cpc,CUR)+'</td>'+
+      '<td class="num">'+F.money(m.cpm,CUR)+'</td><td class="num">'+F.num(m.freq,2)+'</td><td class="num">'+s.pct+'</td>'+
       '<td><span class="chip '+s.grade.cls+'">'+s.grade.label+'</span></td>'+
-      '<td class="diag"><b>'+x.d.link+'.</b> '+x.d.text+(s.notes.length?' <i>('+s.notes.join('; ')+')</i>':'')+'</td></tr>';
-  });
-  h+='</tbody>';
-  $('tbl').innerHTML=h;
-  $('tbl').querySelectorAll('th').forEach(th=>th.onclick=()=>{
-    const k=th.dataset.k; if(k===sortKey)sortDir*=-1; else{sortKey=k;sortDir=-1;}
-    renderTable(scored,ctx);
-  });
-  window.__csv=()=>{
-    const head=['Tên','Chi tiêu','Doanh thu','ROAS','CPO','Đơn','CTR%','CPC','CPM','Freq','Điểm','Xếp hạng','Mắt xích yếu','Chẩn đoán'];
+      '<td class="diag"><b>'+x.d.link+'.</b> '+x.d.text+(s.notes.length?' <i>('+s.notes.join('; ')+')</i>':'')+'</td></tr>';});
+  h+='</tbody>';$('tbl').innerHTML=h;
+  $('tbl').querySelectorAll('th').forEach(th=>th.onclick=()=>{const k=th.dataset.k;if(k===sortKey)sortDir*=-1;else{sortKey=k;sortDir=-1;}renderTable(scored,ctx);});
+  window.__csv=()=>{const head=['Tên','Chi tiêu','Doanh thu','ROAS','CPO','Đơn','CTR%','CPC','CPM','Freq','Điểm','Xếp hạng','Mắt xích yếu','Chẩn đoán'];
     const lines=[head.join(',')].concat(rows.map(x=>{const m=x.m,s=x.s;
-      return [q(m.name),m.spend,m.revenue,r2(m.roas),m.cpo!=null?Math.round(m.cpo):'',m.purch,r2(m.ctr),
-        Math.round(m.cpc),Math.round(m.cpm),r2(m.freq),s.pct,s.grade.label,x.d.link,q(x.d.text+(s.notes.length?' ('+s.notes.join('; ')+')':''))].join(',');}));
-    const blob=new Blob(['\uFEFF'+lines.join('\n')],{type:'text/csv;charset=utf-8'});
-    const url=URL.createObjectURL(blob),a=document.createElement('a');
-    a.href=url;a.download='jps-ads-'+$('level').value+'-'+Date.now()+'.csv';a.click();URL.revokeObjectURL(url);
-  };
+      return[q(m.name),m.spend,m.revenue,r2(m.roas),m.cpo!=null?Math.round(m.cpo):'',m.purch,r2(m.ctr),Math.round(m.cpc),Math.round(m.cpm),r2(m.freq),s.pct,s.grade.label,x.d.link,q(x.d.text)].join(',');}));
+    dl(lines,'jps-ads-'+$('level').value);};
 }
-const r2=n=>n==null||isNaN(n)?'':Math.round(n*100)/100;
-const q=s=>'"'+String(s).replace(/"/g,'""')+'"';
+function dl(lines,name){const blob=new Blob(['\uFEFF'+lines.join('\n')],{type:'text/csv;charset=utf-8'});
+  const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name+'-'+Date.now()+'.csv';a.click();URL.revokeObjectURL(u);}
 
-/* ---------- main ---------- */
+/* ---------- quy tắc đặt tên: parse + gom nhóm ---------- */
+const PAGE_MAP={JPS:'Japanshop.vn','ĐQ':'Đỗ Quang',TH:'Trung Hòa',NVL:'Nguyễn Văn Lộc','TĐN':'Trần Đăng Ninh','MĐ':'Mỹ Đình',Time:'Timecity','NGĐ':'Ngoại Giao Đoàn',LVS:'Lê Văn Sỹ',NTT:'Nguyễn Thị Thập',HBT:'Hai Bà Trưng'};
+const STAFF_MAP={HaiVi:'Dương Hải Vi',QuanNA:'Nguyễn Anh Quân',Vanh:'Phạm Thị Vân Anh',trangle:'Lê Thị Huyền Trang',Chungpv:'Phạm Văn Chung',quantm:'Trần Minh Quân',AnhVV:'Vũ Văn Anh','Thế Anh':'Nguyễn Thế Anh'};
+const RUN_MAP={Mess:'Cuộc trò chuyện',Purchase:'Lượt mua trên Meta',CPO:'Lượt mua trên web',Engage:'Lượt tương tác',Reach:'Tiếp cận',LDP:'Chuyển đổi LDP'};
+const GROUP_MAP={'Giày':'Giày Kosu',Gunze:'Đồ lót Gunze',MP:'Mỹ phẩm','MP Tóc':'Mỹ phẩm tóc',Japanshop:'Chung các dự án'};
+function lookup(map,code){if(code==null||code==='')return'';if(map[code])return map[code];
+  const k=Object.keys(map).find(x=>x.toLowerCase()===String(code).toLowerCase());return k?map[k]:code;}
+function parseName(name){
+  const s=(name||'').trim(); let page='',nhom='',staff='',run='',ngay='',matched=false;
+  if(/^FB[_ ]?O2O/i.test(s)){
+    const p=s.split('_').map(x=>x.trim());
+    page=p[2]||'';nhom=p[3]||'';staff=p[4]||'';ngay=p[5]||'';run=p[7]||p[p.length-1]||'';matched=p.length>=6;
+  }else{
+    const p=s.split(/\s+-\s+/).map(x=>x.trim());
+    if(p.length>=4){page=p[0];nhom=p[1];staff=p[2];run=p[3];ngay=p[4]||'';matched=true;}
+  }
+  return{page,nhom,staff,run,ngay,matched};
+}
+const DIMS={
+  staff:{label:'Nhân sự',get:r=>r._p.staff,name:c=>lookup(STAFF_MAP,c)},
+  run:{label:'Hình thức chạy',get:r=>r._p.run,name:c=>lookup(RUN_MAP,c)},
+  nhom:{label:'Nhóm hàng',get:r=>r._p.nhom,name:c=>lookup(GROUP_MAP,c)},
+  page:{label:'Page',get:r=>r._p.page,name:c=>lookup(PAGE_MAP,c)}
+};
+let curDim='staff';
+function aggMetrics(rows){
+  const o={spend:0,impr:0,reach:0,linkClicks:0,lpViews:0,purch:0,revenue:0,leads:0};
+  rows.forEach(m=>{o.spend+=m.spend;o.impr+=m.impr;o.reach+=m.reach;o.linkClicks+=m.linkClicks;o.lpViews+=m.lpViews;o.purch+=m.purch;o.revenue+=m.revenue;o.leads+=m.leads;});
+  o.ctr=o.impr>0?o.linkClicks/o.impr*100:0;o.cpc=o.linkClicks>0?o.spend/o.linkClicks:0;o.cpm=o.impr>0?o.spend/o.impr*1000:0;
+  o.freq=o.reach>0?o.impr/o.reach:0;o.roas=o.spend>0?o.revenue/o.spend:0;o.cpo=o.purch>0?o.spend/o.purch:null;
+  o.cpl=o.leads>0?o.spend/o.leads:null;o.cvr=o.linkClicks>0?o.purch/o.linkClicks*100:0;o.lpRate=o.linkClicks>0?o.lpViews/o.linkClicks*100:0;
+  o.objective='';o.qr=o.er=o.cr=null;return o;
+}
+function renderGroup(ctx){
+  ROWS.forEach(m=>{if(!m._p)m._p=parseName(m.name);});
+  const matched=ROWS.filter(m=>m._p.matched).length;
+  $('groupCov').textContent='Nhận diện '+matched+'/'+ROWS.length+' theo quy tắc đặt tên';
+  $('groupDims').innerHTML=Object.keys(DIMS).map(k=>'<button class="mchip'+(k===curDim?' on':'')+'" data-d="'+k+'">'+DIMS[k].label+'</button>').join('');
+  $('groupDims').querySelectorAll('.mchip').forEach(b=>b.onclick=()=>{curDim=b.dataset.d;renderGroup(ctx);});
+  const dim=DIMS[curDim],groups={};
+  ROWS.forEach(m=>{const key=dim.get(m)||'(không rõ)';(groups[key]=groups[key]||[]).push(m);});
+  const med=arr=>{const a=arr.filter(v=>v>0).sort((x,y)=>x-y);return a.length?a[Math.floor(a.length/2)]:0;};
+  const agg=Object.keys(groups).map(k=>{const a=aggMetrics(groups[k]);a.name=dim.name(k);a._key=k;a._n=groups[k].length;return a;});
+  const gctx={...ctx,medCPM:med(agg.map(a=>a.cpm)),medCPC:med(agg.map(a=>a.cpc)),medCPL:med(agg.map(a=>a.cpl||0))};
+  const scored=agg.map(a=>({m:a,s:score(a,gctx),d:diagnose(a,gctx)})).sort((p,q)=>q.m.spend-p.m.spend);
+  const cols=['Nhóm','#','Chi tiêu','Doanh thu','ROAS','CPO','Đơn','CTR','CPM','Điểm','Hạng','Chẩn đoán'];
+  let h='<thead><tr>'+cols.map((c,i)=>'<th'+(i===0?'':' style="text-align:right"')+'>'+c+'</th>').join('')+'</tr></thead><tbody>';
+  scored.forEach(x=>{const m=x.m;
+    h+='<tr><td>'+esc(m.name||'(không rõ)')+(m._key&&m._key!=='(không rõ)'&&m._key!==m.name?' <span style="color:var(--faint);font-family:var(--mono);font-size:11px">'+esc(m._key)+'</span>':'')+'</td>'+
+    '<td class="num">'+m._n+'</td><td class="num">'+F.money(m.spend,CUR)+'</td><td class="num">'+F.money(m.revenue,CUR)+'</td>'+
+    '<td class="num">'+F.x(m.roas)+'</td><td class="num">'+(m.cpo!=null?F.money(m.cpo,CUR):'—')+'</td><td class="num">'+F.num(m.purch)+'</td>'+
+    '<td class="num">'+F.pct(m.ctr)+'</td><td class="num">'+F.money(m.cpm,CUR)+'</td><td class="num">'+x.s.pct+'</td>'+
+    '<td><span class="chip '+x.s.grade.cls+'">'+x.s.grade.label+'</span></td><td class="diag"><b>'+x.d.link+'.</b> '+x.d.text+'</td></tr>';});
+  h+='</tbody>';$('gtbl').innerHTML=h;
+}
+
+/* ---------- main (single) ---------- */
 async function run(){
-  const token=$('token').value.trim(), actId=$('acct').value;
+  const token=$('token').value.trim(),actId=$('acct').value;
   if(!token){setStatus('Thiếu access token.',true);return;}
   if(!actId){setStatus('Chưa chọn tài khoản — nhập token để tải danh sách.',true);return;}
   const ver=$('ver').value.trim()||'v23.0';
+  if(actId==='__ALL__')return runAll(token,ver);
   const level=$('level').value;
-  const ctx={breakeven:+$('breakeven').value||3.33, targetCPO:+$('targetCPO').value||0,
-             stoploss:+$('stoploss').value||0, days:rangeDays()};
-  if($('remember').checked)localStorage.setItem('jps_tok',token); else localStorage.removeItem('jps_tok');
+  const ctx={breakeven:+$('breakeven').value||3.33,targetCPO:+$('targetCPO').value||0,stoploss:+$('stoploss').value||0,days:rangeDays()};
+  if($('remember').checked)localStorage.setItem('jps_tok',token);else localStorage.removeItem('jps_tok');
   const G='https://graph.facebook.com/'+ver+'/';
-  $('run').disabled=true; setStatus('Đang kết nối Meta…');
+  $('run').disabled=true;setStatus('Đang kết nối Meta…');
   try{
-    // account info (name + currency)
     const info=await gget(G+actId+'?fields=name,currency,account_status&access_token='+encodeURIComponent(token));
-    CUR=info.currency||'VND';
-    $('acctPill').textContent=(info.name||actId)+' · '+CUR;
-    // account-level totals
+    CUR=info.currency||'VND'; $('acctPill').textContent=(info.name||actId)+' · '+CUR;
     setStatus('Đang tải tổng quan…');
     const accIns=await fetchAll(G+actId+'/insights?level=account&fields='+
       ['spend','impressions','reach','frequency','clicks','inline_link_clicks','ctr','inline_link_click_ctr','cpc','cpm','actions','action_values','purchase_roas'].join(',')+
       timeParam()+'&access_token='+encodeURIComponent(token));
-    // breakdown rows
     setStatus('Đang tải dữ liệu '+level+'…');
-    const raw=await fetchAll(G+actId+'/insights?level='+level+'&fields='+fieldsFor(level)+
-      timeParam()+'&access_token='+encodeURIComponent(token));
+    const raw=await fetchAll(G+actId+'/insights?level='+level+'&fields='+fieldsFor(level)+timeParam()+'&access_token='+encodeURIComponent(token));
     if(!raw.length){setStatus('Không có dữ liệu trong khoảng đã chọn.',true);$('run').disabled=false;return;}
-
     ROWS=raw.map(metrics).filter(m=>m.spend>0);
-    // medians for relative scoring
     const med=arr=>{const a=arr.filter(v=>v>0).sort((x,y)=>x-y);return a.length?a[Math.floor(a.length/2)]:0;};
-    ctx.medCPM=med(ROWS.map(m=>m.cpm));
-    ctx.medCPC=med(ROWS.map(m=>m.cpc));
-    ctx.medCPL=med(ROWS.map(m=>m.cpl||0));
-
-    const acc = accIns.length?metrics(accIns[0]):aggregate(ROWS);
+    ctx.medCPM=med(ROWS.map(m=>m.cpm));ctx.medCPC=med(ROWS.map(m=>m.cpc));ctx.medCPL=med(ROWS.map(m=>m.cpl||0));
+    const acc=accIns.length?metrics(accIns[0]):aggregate(ROWS);
     const scored=ROWS.map(m=>({m,s:score(m,ctx)}));
-
-    renderCards(acc,ctx); renderFunnel(acc,ctx); renderActions(scored,ctx); renderTable(scored,ctx);
+    resetSingleLayout();
+    // daily trend
+    let series=null;
+    if(ctx.days>=2){try{setStatus('Đang tải xu hướng theo ngày…');series=await fetchDaily(G,actId,token);}catch(e){series=null;}}
+    toggleSection('secTrend',$('trendCard'), !!(series&&series.dates.length>=2));
+    renderCards(acc,ctx,series);
+    if(series&&series.dates.length>=2)renderTrend(series);
+    renderFunnel(acc,ctx);renderActions(scored,ctx);renderTable(scored,ctx);
+    toggleSection('secGroup',$('groupCard'),true);renderGroup(ctx);
     $('sumRange').textContent=presetLabel()+' · '+ctx.days+' ngày';
     $('tblLevel').textContent=ROWS.length+' '+level+' (chi tiêu > 0)';
-    $('results').classList.remove('hidden');
+    $('results').classList.remove('hidden');setActiveTab('secOverview');
     setStatus('Xong — '+ROWS.length+' đơn vị, '+F.money(acc.spend,CUR)+' chi tiêu.');
-  }catch(e){
-    setStatus('Lỗi: '+e.message+(/token|OAuth|session/i.test(e.message)?' — kiểm tra token còn hạn & có quyền ads_read.':''),true);
-  }finally{$('run').disabled=false;}
+  }catch(e){setStatus('Lỗi: '+e.message+(/token|OAuth|session/i.test(e.message)?' — kiểm tra token & quyền ads_read.':''),true);}
+  finally{$('run').disabled=false;}
 }
 function aggregate(rows){
-  const s=rows.reduce((o,m)=>{o.spend+=m.spend;o.impr+=m.impr;o.reach+=m.reach;o.linkClicks+=m.linkClicks;
-    o.lpViews+=m.lpViews;o.purch+=m.purch;o.revenue+=m.revenue;o.leads+=m.leads;return o;},
+  const s=rows.reduce((o,m)=>{o.spend+=m.spend;o.impr+=m.impr;o.reach+=m.reach;o.linkClicks+=m.linkClicks;o.lpViews+=m.lpViews;o.purch+=m.purch;o.revenue+=m.revenue;o.leads+=m.leads;return o;},
     {spend:0,impr:0,reach:0,linkClicks:0,lpViews:0,purch:0,revenue:0,leads:0});
-  s.ctr=s.impr>0?s.linkClicks/s.impr*100:0; s.cpc=s.linkClicks>0?s.spend/s.linkClicks:0;
-  s.cpm=s.impr>0?s.spend/s.impr*1000:0; s.freq=s.reach>0?s.impr/s.reach:0;
-  s.roas=s.spend>0?s.revenue/s.spend:0; s.cpo=s.purch>0?s.spend/s.purch:null;
-  s.cvr=s.linkClicks>0?s.purch/s.linkClicks*100:0; s.lpRate=s.linkClicks>0?s.lpViews/s.linkClicks*100:0;
-  s.objective='';s.qr=s.er=s.cr=null; return s;
+  s.ctr=s.impr>0?s.linkClicks/s.impr*100:0;s.cpc=s.linkClicks>0?s.spend/s.linkClicks:0;s.cpm=s.impr>0?s.spend/s.impr*1000:0;
+  s.freq=s.reach>0?s.impr/s.reach:0;s.roas=s.spend>0?s.revenue/s.spend:0;s.cpo=s.purch>0?s.spend/s.purch:null;
+  s.cvr=s.linkClicks>0?s.purch/s.linkClicks*100:0;s.lpRate=s.linkClicks>0?s.lpViews/s.linkClicks*100:0;
+  s.objective='';s.qr=s.er=s.cr=null;return s;
 }
-function presetLabel(){const o=$('preset');return o.options[o.selectedIndex].text;}
-function setStatus(t,err){const s=$('status');s.textContent=t;s.className='status'+(err?' err':'');}
 
-/* tự tải danh sách ad account từ token */
-async function loadAccounts(){
-  const token=$('token').value.trim(); if(!token)return;
-  const ver=$('ver').value.trim()||'v23.0', sel=$('acct');
-  setStatus('Đang tải danh sách tài khoản…');
+/* ---------- TẤT CẢ tài khoản ---------- */
+function emptyMetrics(name){return{name,objective:'',spend:0,impr:0,reach:0,freq:0,linkClicks:0,ctr:0,cpc:0,cpm:0,purch:0,revenue:0,roas:0,leads:0,lpViews:0,cpo:null,cpl:null,cvr:0,lpRate:0,qr:null,er:null,cr:null};}
+async function runAll(token,ver){
+  if(!ACCOUNTS.length){setStatus('Chưa có danh sách tài khoản.',true);return;}
+  const G='https://graph.facebook.com/'+ver+'/';
+  const ctx={breakeven:+$('breakeven').value||3.33,targetCPO:+$('targetCPO').value||0,stoploss:+$('stoploss').value||0,days:rangeDays()};
+  const accFields=['spend','impressions','reach','frequency','clicks','inline_link_clicks','ctr','inline_link_click_ctr','cpc','cpm','actions','action_values','purchase_roas'].join(',');
+  $('run').disabled=true;const results=[];
   try{
-    const rows=await fetchAll('https://graph.facebook.com/'+ver+
-      '/me/adaccounts?fields=name,currency,account_status&limit=200&access_token='+encodeURIComponent(token));
-    if(!rows.length){sel.innerHTML='<option value="">không có tài khoản</option>';
-      setStatus('Token không truy cập được tài khoản quảng cáo nào.',true);return;}
-    sel.innerHTML=rows.map(a=>'<option value="'+a.id+'" data-cur="'+(a.currency||'VND')+'">'+
-      esc(a.name||a.id)+(a.account_status&&a.account_status!==1?' (ngưng)':'')+'</option>').join('');
-    setStatus(rows.length+' tài khoản — chọn rồi bấm phân tích.');
-  }catch(e){
-    sel.innerHTML='<option value="">— nhập token trước —</option>';
-    setStatus('Lỗi tải tài khoản: '+e.message+(/token|OAuth|session/i.test(e.message)?' — kiểm tra token & quyền ads_read.':''),true);
-  }
+    for(let i=0;i<ACCOUNTS.length;i++){const a=ACCOUNTS[i];setStatus('Đang tải '+(i+1)+'/'+ACCOUNTS.length+' — '+a.name);
+      try{const ins=await fetchAll(G+a.id+'/insights?level=account&fields='+accFields+timeParam()+'&access_token='+encodeURIComponent(token));
+        const m=ins.length?metrics(ins[0]):emptyMetrics(a.name);m.name=a.name;results.push({acc:a,m});}
+      catch(e){const m=emptyMetrics(a.name);results.push({acc:a,m,err:e.message});}}
+    const live=results.filter(r=>r.m.spend>0);
+    const med=arr=>{const x=arr.filter(v=>v>0).sort((p,q)=>p-q);return x.length?x[Math.floor(x.length/2)]:0;};
+    ctx.medCPM=med(live.map(r=>r.m.cpm));ctx.medCPC=med(live.map(r=>r.m.cpc));ctx.medCPL=med(live.map(r=>r.m.cpl||0));
+    const scored=results.map(r=>({...r,s:r.m.spend>0?score(r.m,ctx):null,d:r.m.spend>0?diagnose(r.m,ctx):null}));
+    renderMulti(scored,ctx);$('results').classList.remove('hidden');setActiveTab('secOverview');
+    setStatus('Xong — '+results.length+' tài khoản ('+live.length+' có chi tiêu).');
+  }catch(e){setStatus('Lỗi: '+e.message,true);}finally{$('run').disabled=false;}
+}
+function renderMulti(scored,ctx){
+  $('sumH').textContent='Tổng quan danh mục';$('tblH').textContent='So sánh tài khoản';
+  toggleSection('secTrend',$('trendCard'),false);toggleSection('secFunnel',$('funnel'),false);toggleSection('secGroup',$('groupCard'),false);
+  $('sumRange').textContent=presetLabel()+' · '+ctx.days+' ngày';$('tblLevel').textContent=scored.length+' tài khoản';
+  const live=scored.filter(r=>r.m.spend>0),curMap={},revMap={};
+  live.forEach(r=>{curMap[r.acc.cur]=(curMap[r.acc.cur]||0)+r.m.spend;revMap[r.acc.cur]=(revMap[r.acc.cur]||0)+r.m.revenue;});
+  const curs=Object.keys(curMap).sort((a,b)=>curMap[b]-curMap[a]),mainCur=curs[0]||'VND';
+  const more=curs.length>1?'+'+(curs.length-1)+' tiền tệ khác':'&nbsp;';
+  const byRoas=live.filter(r=>r.m.roas>0).sort((a,b)=>b.m.roas-a.m.roas),best=byRoas[0],worst=byRoas[byRoas.length-1];
+  const totPurch=live.reduce((s,r)=>s+r.m.purch,0),warns=scored.filter(r=>r.s&&r.s.grade.rank<=2).length;
+  const cards=[['Tài khoản',live.length+'/'+scored.length,'có chi tiêu'],
+    ['Chi tiêu ('+mainCur+')',F.money(curMap[mainCur]||0,mainCur),more],
+    ['Doanh thu ('+mainCur+')',F.money(revMap[mainCur]||0,mainCur),totPurch+' đơn'],
+    ['Cảnh báo',String(warns),'tài khoản ≤ Khá',warns?'warn':'good'],
+    ['ROAS cao nhất',best?F.x(best.m.roas):'—',best?best.acc.name:'&nbsp;','good'],
+    ['ROAS thấp nhất',worst?F.x(worst.m.roas):'—',worst?worst.acc.name:'&nbsp;','bad'],
+    ['CPM trung vị',ctx.medCPM?F.num(ctx.medCPM,0):'—',curs.length>1?'(nhiều tiền tệ)':mainCur],
+    ['CPC trung vị',ctx.medCPC?F.num(ctx.medCPC,0):'—',curs.length>1?'(nhiều tiền tệ)':mainCur]];
+  const c=$('cards');c.innerHTML='';
+  cards.forEach(([k,v,d,cls],i)=>{const el=document.createElement('div');el.className='sc';el.style.animationDelay=(i*40)+'ms';
+    el.innerHTML='<div class="k">'+k+'</div><div class="v '+(cls||'')+'">'+v+'</div><div class="d">'+(d||'&nbsp;')+'</div>';c.appendChild(el);});
+  const weak=scored.filter(r=>r.s&&r.s.grade.rank<=2).sort((a,b)=>(b.d.severity-a.d.severity)||(b.m.spend-a.m.spend)).slice(0,6);
+  $('actions').innerHTML=weak.length?weak.map(r=>{const sev=r.d.severity>=3?'bad':r.d.severity>=2?'warn':'ok';
+    return'<div class="act '+sev+'"><div class="sev"></div><div class="body"><div class="who">'+esc(r.acc.name)+'<span class="sp">'+F.money(r.m.spend,r.acc.cur)+' · '+r.s.grade.label+'</span></div>'+
+      '<p><span class="lab p">Vấn đề</span>'+r.d.text+'</p><p><span class="lab a">Hành động</span>'+r.d.action+'</p><p><span class="lab e">Kỳ vọng</span>'+r.d.expect+'</p></div></div>';}).join('')
+    :'<div class="act ok"><div class="sev"></div><div class="body"><div class="who">Không có tài khoản nào đáng lo 🎉</div></div></div>';
+  renderMultiTable(scored,ctx,mainCur);
+}
+let mSortKey='spend',mSortDir=-1;
+function renderMultiTable(scored,ctx,mainCur){
+  const cols=[['name','Tài khoản'],['spend','Chi tiêu'],['revenue','Doanh thu'],['roas','ROAS'],['cpo','CPO'],['purch','Đơn'],
+    ['ctr','CTR'],['cpc','CPC'],['cpm','CPM'],['freq','Freq'],['pct','Điểm'],['grade','Hạng'],['diag','Chẩn đoán']];
+  const rows=scored.slice().sort((a,b)=>{let av,bv;
+    if(mSortKey==='pct'||mSortKey==='grade'){av=a.s?a.s.pct:-1;bv=b.s?b.s.pct:-1;}
+    else if(mSortKey==='diag'){av=a.d?a.d.severity:-1;bv=b.d?b.d.severity:-1;}
+    else if(mSortKey==='name')return mSortDir*String(a.acc.name).localeCompare(b.acc.name);
+    else{av=a.m[mSortKey]??-1;bv=b.m[mSortKey]??-1;}return mSortDir*((av>bv)-(av<bv));});
+  let h='<thead><tr>'+cols.map(c=>'<th data-k="'+c[0]+'">'+c[1]+(mSortKey===c[0]?(mSortDir<0?' ↓':' ↑'):'')+'</th>').join('')+'</tr></thead><tbody>';
+  rows.forEach(r=>{const m=r.m,cur=r.acc.cur;
+    if(m.spend<=0){h+='<tr><td title="'+esc(r.acc.name)+'">'+esc(r.acc.name)+'</td><td colspan="11" style="text-align:left;color:var(--faint)">không chi tiêu trong kỳ'+(r.err?' · lỗi: '+esc(r.err):'')+'</td><td class="diag">—</td></tr>';return;}
+    h+='<tr data-id="'+r.acc.id+'" style="cursor:pointer"><td title="'+esc(r.acc.name)+' — bấm để xem chi tiết">'+esc(r.acc.name)+'</td>'+
+      '<td class="num">'+F.money(m.spend,cur)+'</td><td class="num">'+F.money(m.revenue,cur)+'</td><td class="num">'+F.x(m.roas)+'</td>'+
+      '<td class="num">'+(m.cpo!=null?F.money(m.cpo,cur):'—')+'</td><td class="num">'+F.num(m.purch)+'</td><td class="num">'+F.pct(m.ctr)+'</td>'+
+      '<td class="num">'+F.money(m.cpc,cur)+'</td><td class="num">'+F.money(m.cpm,cur)+'</td><td class="num">'+F.num(m.freq,2)+'</td>'+
+      '<td class="num">'+(r.s?r.s.pct:'—')+'</td><td>'+(r.s?'<span class="chip '+r.s.grade.cls+'">'+r.s.grade.label+'</span>':'—')+'</td>'+
+      '<td class="diag">'+(r.d?'<b>'+r.d.link+'.</b> '+r.d.text:'—')+(r.s&&r.s.notes.length?' <i>('+r.s.notes.join('; ')+')</i>':'')+'</td></tr>';});
+  h+='</tbody>';$('tbl').innerHTML=h;
+  $('tbl').querySelectorAll('th').forEach(th=>th.onclick=()=>{const k=th.dataset.k;if(k===mSortKey)mSortDir*=-1;else{mSortKey=k;mSortDir=-1;}renderMultiTable(scored,ctx,mainCur);});
+  $('tbl').querySelectorAll('tbody tr[data-id]').forEach(tr=>tr.onclick=()=>{$('acct').value=tr.dataset.id;window.scrollTo({top:0,behavior:'smooth'});run();});
+  window.__csv=()=>{const head=['Tài khoản','Tiền tệ','Chi tiêu','Doanh thu','ROAS','CPO','Đơn','CTR%','CPC','CPM','Freq','Điểm','Hạng','Mắt xích yếu','Chẩn đoán'];
+    const lines=[head.join(',')].concat(rows.map(r=>{const m=r.m;
+      return[q(r.acc.name),r.acc.cur,m.spend,m.revenue,r2(m.roas),m.cpo!=null?Math.round(m.cpo):'',m.purch,r2(m.ctr),Math.round(m.cpc),Math.round(m.cpm),r2(m.freq),r.s?r.s.pct:'',r.s?r.s.grade.label:'',r.d?r.d.link:'',q(r.d?r.d.text:'')].join(',');}));
+    dl(lines,'jps-ads-all');};
 }
 
-/* wiring */
+/* ---------- accounts ---------- */
+async function loadAccounts(){
+  const token=$('token').value.trim();if(!token)return;
+  const ver=$('ver').value.trim()||'v23.0',sel=$('acct');setStatus('Đang tải danh sách tài khoản…');
+  try{const rows=await fetchAll('https://graph.facebook.com/'+ver+'/me/adaccounts?fields=name,currency,account_status&access_token='+encodeURIComponent(token));
+    if(!rows.length){sel.innerHTML='<option value="">không có tài khoản</option>';setStatus('Token không truy cập được tài khoản nào.',true);return;}
+    ACCOUNTS=rows.map(a=>({id:a.id,name:a.name||a.id,cur:a.currency||'VND',status:a.account_status}));
+    sel.innerHTML='<option value="__ALL__">★ Tất cả tài khoản ('+rows.length+')</option>'+
+      ACCOUNTS.map(a=>'<option value="'+a.id+'" data-cur="'+a.cur+'">'+esc(a.name)+(a.status&&a.status!==1?' (ngưng)':'')+'</option>').join('');
+    setStatus(rows.length+' tài khoản — chọn 1 hoặc "Tất cả" rồi bấm phân tích.');
+  }catch(e){sel.innerHTML='<option value="">— nhập token trước —</option>';
+    setStatus('Lỗi tải tài khoản: '+e.message+(/token|OAuth|session/i.test(e.message)?' — kiểm tra token & quyền ads_read.':''),true);}
+}
+
+/* ---------- wiring ---------- */
 $('preset').onchange=()=>$('customRange').style.display=$('preset').value==='custom'?'grid':'none';
 $('run').onclick=run;
 $('csv').onclick=()=>window.__csv&&window.__csv();
 $('token').addEventListener('blur',loadAccounts);
-const saved=localStorage.getItem('jps_tok'); if(saved){$('token').value=saved;$('remember').checked=true;loadAccounts();}
+document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{const t=$(b.dataset.t);if(t){setActiveTab(b.dataset.t);t.scrollIntoView({behavior:'smooth',block:'start'});}});
+// scroll spy
+let spyT;window.addEventListener('scroll',()=>{clearTimeout(spyT);spyT=setTimeout(()=>{
+  if($('results').classList.contains('hidden'))return;
+  const ids=['secOverview','secTrend','secFunnel','secActions','secGroup','secDetail'];let cur=ids[0];
+  for(const id of ids){const el=$(id);if(el&&el.style.display!=='none'&&el.getBoundingClientRect().top<=90)cur=id;}
+  setActiveTab(cur);},80);});
+// theme
+function setTheme(t){document.documentElement.setAttribute('data-theme',t);$('theme').textContent=t==='dark'?'☾':'☀';localStorage.setItem('jps_theme',t);
+  if(SERIES&&!$('trendCard').style.display)drawChart(SERIES,curMetric);}
+$('theme').onclick=()=>setTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');
+setTheme(localStorage.getItem('jps_theme')||'dark');
+// restore token
+const saved=localStorage.getItem('jps_tok');if(saved){$('token').value=saved;$('remember').checked=true;loadAccounts();}
 </script>
 </body>
 </html>
