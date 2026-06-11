@@ -157,9 +157,9 @@
         <span class="hint">Token có quyền <code>ads_read</code></span>
         <input id="token" type="password" placeholder="EAAB..." autocomplete="off" />
       </label>
-      <label class="fld">Ad Account ID
-        <span class="hint">Dạng <code>act_1234567890</code></span>
-        <input id="acct" placeholder="act_..." autocomplete="off" />
+      <label class="fld">Tài khoản quảng cáo
+        <span class="hint">Tự tải từ token</span>
+        <select id="acct"><option value="">— nhập token trước —</option></select>
       </label>
       <label class="fld">Khoảng thời gian
         <span class="hint">&nbsp;</span>
@@ -229,7 +229,7 @@
 
     <div class="row-end">
       <button class="btn" id="run">Tải dữ liệu &amp; phân tích</button>
-      <span class="status" id="status">Nhập token + Ad Account ID rồi bấm phân tích.</span>
+      <span class="status" id="status">Nhập token → chọn tài khoản → phân tích.</span>
     </div>
   </div>
 
@@ -561,10 +561,10 @@ const q=s=>'"'+String(s).replace(/"/g,'""')+'"';
 
 /* ---------- main ---------- */
 async function run(){
-  const token=$('token').value.trim(), acct=$('acct').value.trim().replace(/^act_?/,'');
-  if(!token||!acct){setStatus('Thiếu token hoặc Ad Account ID.',true);return;}
+  const token=$('token').value.trim(), actId=$('acct').value;
+  if(!token){setStatus('Thiếu access token.',true);return;}
+  if(!actId){setStatus('Chưa chọn tài khoản — nhập token để tải danh sách.',true);return;}
   const ver=$('ver').value.trim()||'v23.0';
-  const actId='act_'+acct;
   const level=$('level').value;
   const ctx={breakeven:+$('breakeven').value||3.33, targetCPO:+$('targetCPO').value||0,
              stoploss:+$('stoploss').value||0, days:rangeDays()};
@@ -619,11 +619,31 @@ function aggregate(rows){
 function presetLabel(){const o=$('preset');return o.options[o.selectedIndex].text;}
 function setStatus(t,err){const s=$('status');s.textContent=t;s.className='status'+(err?' err':'');}
 
+/* tự tải danh sách ad account từ token */
+async function loadAccounts(){
+  const token=$('token').value.trim(); if(!token)return;
+  const ver=$('ver').value.trim()||'v23.0', sel=$('acct');
+  setStatus('Đang tải danh sách tài khoản…');
+  try{
+    const rows=await fetchAll('https://graph.facebook.com/'+ver+
+      '/me/adaccounts?fields=name,currency,account_status&limit=200&access_token='+encodeURIComponent(token));
+    if(!rows.length){sel.innerHTML='<option value="">không có tài khoản</option>';
+      setStatus('Token không truy cập được tài khoản quảng cáo nào.',true);return;}
+    sel.innerHTML=rows.map(a=>'<option value="'+a.id+'" data-cur="'+(a.currency||'VND')+'">'+
+      esc(a.name||a.id)+(a.account_status&&a.account_status!==1?' (ngưng)':'')+'</option>').join('');
+    setStatus(rows.length+' tài khoản — chọn rồi bấm phân tích.');
+  }catch(e){
+    sel.innerHTML='<option value="">— nhập token trước —</option>';
+    setStatus('Lỗi tải tài khoản: '+e.message+(/token|OAuth|session/i.test(e.message)?' — kiểm tra token & quyền ads_read.':''),true);
+  }
+}
+
 /* wiring */
 $('preset').onchange=()=>$('customRange').style.display=$('preset').value==='custom'?'grid':'none';
 $('run').onclick=run;
 $('csv').onclick=()=>window.__csv&&window.__csv();
-const saved=localStorage.getItem('jps_tok'); if(saved){$('token').value=saved;$('remember').checked=true;}
+$('token').addEventListener('blur',loadAccounts);
+const saved=localStorage.getItem('jps_tok'); if(saved){$('token').value=saved;$('remember').checked=true;loadAccounts();}
 </script>
 </body>
 </html>
