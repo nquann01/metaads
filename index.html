@@ -1,241 +1,214 @@
 <!doctype html>
-<html lang="vi" data-theme="dark">
+<html lang="vi" data-theme="light">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>JPS Ads Console</title>
 <style>
   :root{
-    --bg:#0A0C10; --bg-soft:#0D1016; --panel:#10141B; --panel-2:#161B23; --raise:#1A2029;
-    --ink:#E7ECF2; --muted:#8C95A3; --faint:#5A6472;
-    --line:#1B212B; --line-2:#2A3340; --line-3:#3A4452;
-    --accent:#A3E635; --accent-2:#BEF264; --accent-soft:rgba(163,230,53,.13); --accent-ink:#10140A;
-    --good:#6EE7A8; --good-bg:rgba(110,231,168,.13); --ok:#E3C766; --ok-bg:rgba(227,199,102,.13);
-    --warn:#F0A35E; --warn-bg:rgba(240,163,94,.14); --bad:#F2768D; --bad-bg:rgba(242,118,141,.14);
-    --grid:rgba(255,255,255,.05);
-    --mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --bg:#F4F5F7; --panel:#FFFFFF; --panel-2:#F7F8FA; --ink:#16181D; --muted:#5A6270; --faint:#98A0AC;
+    --line:#E5E8ED; --line-2:#D3D8E0;
+    --accent:#4F46E5; --accent-2:#4338CA; --accent-soft:rgba(79,70,229,.09); --btn-ink:#FFFFFF;
+    --good:#059669; --good-bg:#E7F6F0; --ok:#B45309; --ok-bg:#F9F0DD;
+    --warn:#C2410C; --warn-bg:#FBEADF; --bad:#BE123C; --bad-bg:#FBE7EC;
+    --lv1bg:#EEF0FD; --lv2bg:#F7F8FE; --zebra:#FAFBFC;
+    --grid:rgba(22,24,29,.07);
+    --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
     --ui:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-    --r:7px; --r-sm:5px;
+    --r:12px;
   }
-  html[data-theme="light"]{
-    --bg:#F1EFE7; --bg-soft:#EDEAE0; --panel:#FBFAF5; --panel-2:#F3F1E9; --raise:#FFFFFF;
-    --ink:#1A1D22; --muted:#5C6470; --faint:#94999F;
-    --line:#E0DCD0; --line-2:#CFCABB; --line-3:#BCB6A4;
-    --accent:#4D7C0F; --accent-2:#3F6B0A; --accent-soft:rgba(77,124,15,.12); --accent-ink:#FFFFFF;
-    --good:#15803D; --good-bg:rgba(21,128,61,.10); --ok:#A16207; --ok-bg:rgba(161,98,7,.10);
-    --warn:#C2410C; --warn-bg:rgba(194,65,12,.10); --bad:#BE123C; --bad-bg:rgba(190,18,60,.10);
-    --grid:rgba(0,0,0,.06);
+  html[data-theme="dark"]{
+    --bg:#0E1014; --panel:#161922; --panel-2:#1C2029; --ink:#E8EBF1; --muted:#9298A6; --faint:#5C6470;
+    --line:#242936; --line-2:#333A4A;
+    --accent:#818CF8; --accent-2:#A5B0FF; --accent-soft:rgba(129,140,248,.14); --btn-ink:#13163A;
+    --good:#34D399; --good-bg:rgba(52,211,153,.14); --ok:#FBBF24; --ok-bg:rgba(251,191,36,.14);
+    --warn:#FB923C; --warn-bg:rgba(251,146,60,.14); --bad:#FB7185; --bad-bg:rgba(251,113,133,.14);
+    --lv1bg:#222741; --lv2bg:#1B1F30; --zebra:rgba(255,255,255,.025);
+    --grid:rgba(255,255,255,.07);
   }
   *{box-sizing:border-box}
-  html,body{height:100%}
-  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ui);font-size:14px;line-height:1.5;
-       -webkit-font-smoothing:antialiased;transition:background .2s,color .2s}
-  h1,h2,h3{margin:0;letter-spacing:-.01em}
-  ::selection{background:var(--accent);color:var(--accent-ink)}
-  .mono{font-family:var(--mono)}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ui);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  h1,h2,h3,h4{margin:0;letter-spacing:-.01em}
 
-  /* ---- app frame ---- */
-  .app{min-height:100vh;display:flex;flex-direction:column}
-  .head{position:sticky;top:0;z-index:30;background:var(--bg-soft)}
+  /* ===== header (khối sticky duy nhất) ===== */
+  .hdr{position:sticky;top:0;z-index:40;background:var(--panel);border-bottom:1px solid var(--line)}
+  .hrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 20px;max-width:1280px;margin:0 auto;width:100%}
+  .hrow+.hrow{padding-top:0}
+  .brand{display:flex;align-items:center;gap:10px;margin-right:6px}
+  .mark{width:30px;height:30px;border-radius:8px;background:var(--accent);color:var(--btn-ink);display:grid;place-items:center;font-weight:900;font-size:12.5px}
+  .brand b{font-size:15px;font-weight:800}
+  .brand small{display:block;font-size:10.5px;color:var(--faint);font-family:var(--mono);line-height:1.2}
+  .acctPill{margin-left:auto;font-family:var(--mono);font-size:11.5px;color:var(--muted);background:var(--panel-2);
+            border:1px solid var(--line);padding:5px 12px;border-radius:999px;max-width:330px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .iconbtn{width:32px;height:32px;border-radius:8px;border:1px solid var(--line-2);background:var(--panel);color:var(--ink);
+           cursor:pointer;font-size:14px;display:grid;place-items:center}
+  .iconbtn:hover{background:var(--panel-2)}
+  .tools select{min-width:118px}
+  .tools .grow{flex:1;min-width:170px}
 
-  /* top bar */
-  .topbar{display:flex;align-items:center;gap:14px;padding:11px 18px;background:var(--bg-soft);
-          border-bottom:1px solid var(--line)}
-  .brand{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-weight:800;letter-spacing:.02em;font-size:15px}
-  .brand .cur{color:var(--accent);animation:blink 1.15s steps(1) infinite}
-  @keyframes blink{50%{opacity:0}}
-  .brand .slash{color:var(--accent);font-weight:700}
-  .brand small{font-family:var(--mono);font-weight:400;font-size:10.5px;color:var(--faint);margin-left:8px;letter-spacing:.04em;text-transform:uppercase}
-  .topright{margin-left:auto;display:flex;align-items:center;gap:10px}
-  .acctPill{font-family:var(--mono);font-size:11.5px;color:var(--muted);background:var(--panel);border:1px solid var(--line-2);
-            padding:5px 11px;border-radius:999px;max-width:340px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .acctPill::before{content:"◍ ";color:var(--accent)}
-  .iconbtn{width:32px;height:32px;border-radius:var(--r-sm);border:1px solid var(--line-2);background:var(--panel);
-           color:var(--ink);cursor:pointer;font-size:14px;display:grid;place-items:center}
-  .iconbtn:hover{border-color:var(--accent);color:var(--accent)}
+  /* ===== tabs ===== */
+  .tabsbar{background:var(--panel);border-bottom:1px solid var(--line)}
+  .tabs{display:flex;align-items:center;gap:2px;max-width:1280px;margin:0 auto;padding:0 20px;overflow-x:auto}
+  .tabs button{border:0;background:transparent;color:var(--muted);font:inherit;font-weight:650;font-size:13.5px;
+        padding:11px 14px;cursor:pointer;border-bottom:2.5px solid transparent;white-space:nowrap}
+  .tabs button:hover{color:var(--ink)}
+  .tabs button.on{color:var(--accent);border-bottom-color:var(--accent)}
+  .tabs button.off{display:none}
+  .tabs .status{margin-left:auto;font-family:var(--mono);font-size:11.5px;color:var(--muted);padding:6px 0 6px 14px;text-align:right}
+  .tabs .status.err{color:var(--bad)}
 
-  /* command bar */
-  .cmdbar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;padding:11px 18px;background:var(--panel);
-          border-bottom:1px solid var(--line)}
-  .cmdbar .prompt{font-family:var(--mono);font-weight:800;color:var(--accent);font-size:16px;line-height:1}
-  .cmdbar .grow{flex:1;min-width:170px}
-  .cmdbar select{min-width:122px}
-  .custom{display:flex;gap:10px;padding:10px 18px;background:var(--panel);border-bottom:1px solid var(--line)}
+  /* ===== filter bar ===== */
+  .subbar{background:var(--panel-2);border-bottom:1px solid var(--line)}
+  .subin{display:flex;align-items:center;gap:9px;flex-wrap:wrap;max-width:1280px;margin:0 auto;padding:10px 20px}
+  .flab{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--faint)}
+  .subin select{min-width:145px;max-width:200px} .subin select:disabled{opacity:.45}
+  .fcount{font-family:var(--mono);font-size:12px;color:var(--accent);font-weight:700}
+  .scope{display:inline-flex;gap:3px;padding:3px;background:var(--panel);border:1px solid var(--line-2);border-radius:9px}
+  .scope button{border:0;background:transparent;color:var(--muted);font:inherit;font-weight:700;font-size:12.5px;padding:5px 13px;border-radius:6px;cursor:pointer}
+  .scope button:hover{color:var(--ink)} .scope button.on{background:var(--accent);color:var(--btn-ink)}
 
-  /* body split */
-  .body{display:flex;align-items:stretch;flex:1}
-  .rail{width:206px;flex:0 0 206px;background:var(--bg-soft);border-right:1px solid var(--line);padding:14px 12px}
-  .rail-h{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);
-          padding:4px 10px 9px;border-bottom:1px solid var(--line);margin-bottom:7px}
-  .rail button{display:flex;align-items:center;gap:9px;width:100%;border:0;background:transparent;color:var(--muted);
-        font-family:var(--mono);font-weight:500;font-size:13px;text-align:left;padding:9px 11px;border-radius:var(--r-sm);
-        cursor:pointer;border-left:2px solid transparent;transition:all .12s;margin-bottom:1px}
-  .rail button i{font-style:normal;color:var(--faint);font-size:12px}
-  .rail button:hover{background:var(--panel-2);color:var(--ink)}
-  .rail button.on{background:var(--accent-soft);color:var(--accent);border-left-color:var(--accent)}
-  .rail button.on i{color:var(--accent)}
-  .rail button.off{display:none}
-
-  .stage{flex:1;min-width:0;display:flex;flex-direction:column}
-  .subbar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;padding:11px 22px;background:var(--bg-soft);border-bottom:1px solid var(--line)}
-  .subbar .flab{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-left:6px}
-  .subbar select{min-width:150px} .subbar select:disabled{opacity:.4}
-  .fcount{font-family:var(--mono);font-size:12px;color:var(--accent);font-weight:600}
-  .content{padding:22px 22px 40px;max-width:1240px;width:100%}
-
+  /* ===== content ===== */
+  .wrap{max-width:1280px;margin:0 auto;padding:22px 20px 60px}
   .panel{display:none;animation:fade .22s ease} .panel.show{display:block}
   @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
-  .phead{display:flex;align-items:baseline;gap:12px;margin-bottom:16px;padding-bottom:11px;border-bottom:1px solid var(--line)}
-  .phead h3{font-family:var(--mono);font-size:15px;font-weight:700;letter-spacing:.01em}
-  .phead h3::before{content:"// ";color:var(--accent);font-weight:800}
-  .phead .psub{font-family:var(--mono);font-size:11.5px;color:var(--faint)}
+  .phead{display:flex;align-items:baseline;gap:11px;margin:0 0 14px}
+  .phead h3{font-size:17px;font-weight:800}
+  .phead .psub{font-size:12.5px;color:var(--muted)}
   .phead .btn.sm{margin-left:auto}
+  .shead{display:flex;align-items:baseline;gap:10px;margin:26px 0 12px}
+  .shead h4{font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+  .shead h4::before{content:"";display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--accent);margin-right:8px;vertical-align:1px}
+  .shead .psub{font-size:12px;color:var(--faint)}
 
-  /* status bar */
-  .statusbar{display:flex;align-items:center;gap:10px;padding:8px 18px;background:var(--bg-soft);border-top:1px solid var(--line);
-             position:sticky;bottom:0;z-index:30}
-  .statusbar .led{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 0 var(--accent);animation:pulse 2s infinite}
-  @keyframes pulse{0%{box-shadow:0 0 0 0 var(--accent-soft)}70%{box-shadow:0 0 0 6px transparent}100%{box-shadow:0 0 0 0 transparent}}
-  .status{font-family:var(--mono);font-size:12px;color:var(--muted)} .status.err{color:var(--bad)}
-  .statusbar:has(.status.err) .led{background:var(--bad)}
-
-  /* ---- cards / form ---- */
   .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r)}
   .pad{padding:20px}
-  .ph{font-family:var(--mono);font-size:13px;font-weight:700;margin-bottom:15px;padding-bottom:11px;border-bottom:1px solid var(--line);
-      letter-spacing:.02em;text-transform:uppercase;color:var(--muted)}
-  .ph::before{content:"› ";color:var(--accent)}
-  .grid{display:grid;gap:13px} .g4{grid-template-columns:repeat(4,1fr)} .g3{grid-template-columns:repeat(3,1fr)} .g2{grid-template-columns:1fr 1fr}
-  @media(max-width:760px){.g4,.g3,.g2{grid-template-columns:1fr 1fr}}
-  label.fld{display:flex;flex-direction:column;gap:6px;font-family:var(--mono);font-size:11px;color:var(--muted);font-weight:600;
-            text-transform:uppercase;letter-spacing:.04em}
-  label.fld .hint{font-weight:400;color:var(--faint);font-size:10.5px;text-transform:none;letter-spacing:0}
-  input,select{font-family:var(--mono);font-size:13px;padding:9px 11px;border:1px solid var(--line-2);border-radius:var(--r-sm);
-        background:var(--bg-soft);color:var(--ink);width:100%}
+
+  /* form */
+  .cfg-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+  @media(max-width:860px){.cfg-grid{grid-template-columns:1fr}}
+  .ph{font-size:14px;font-weight:800;margin-bottom:15px;padding-bottom:11px;border-bottom:1px solid var(--line)}
+  .frm{display:grid;gap:13px} .f2{grid-template-columns:1fr 1fr}
+  @media(max-width:560px){.f2{grid-template-columns:1fr}}
+  label.fld{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--muted);font-weight:650}
+  label.fld .hint{font-weight:400;color:var(--faint);font-size:11px}
+  input,select{font:inherit;font-size:13.5px;padding:9px 11px;border:1px solid var(--line-2);border-radius:9px;background:var(--panel);color:var(--ink);width:100%}
   select{cursor:pointer}
-  input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+  input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
   input::placeholder{color:var(--faint)}
-  .chk{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;color:var(--muted)} .chk input{width:auto;accent-color:var(--accent)}
-  .hint2{font-size:12px;color:var(--muted);margin:15px 0 0;line-height:1.6} .hint2 code{font-family:var(--mono);background:var(--panel-2);padding:1px 6px;border-radius:4px;color:var(--accent)}
-  .btn{background:var(--accent);color:var(--accent-ink);border:0;border-radius:var(--r-sm);padding:10px 17px;font-family:var(--mono);font-weight:700;
-       font-size:12.5px;letter-spacing:.02em;cursor:pointer;transition:filter .15s,transform .05s;white-space:nowrap}
-  .btn:hover{filter:brightness(1.08)} .btn:active{transform:translateY(1px)} .btn:disabled{opacity:.45;cursor:not-allowed}
-  .btn.sm{padding:7px 13px;font-size:11.5px} .btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--line-2);font-weight:600}
+  .chk{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted)} .chk input{width:auto;accent-color:var(--accent)}
+  .btn{background:var(--accent);color:var(--btn-ink);border:0;border-radius:9px;padding:9px 17px;font:inherit;font-weight:700;
+       font-size:13.5px;cursor:pointer;white-space:nowrap;transition:filter .15s}
+  .btn:hover{filter:brightness(1.08)} .btn:disabled{opacity:.5;cursor:not-allowed}
+  .btn.sm{padding:7px 13px;font-size:12.5px}
+  .btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--line-2);font-weight:650}
   .btn.ghost:hover{background:var(--accent-soft);border-color:var(--accent);filter:none}
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-top:16px}
+  @media(max-width:760px){.steps{grid-template-columns:1fr}}
+  .step{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:13px 15px;font-size:12.5px;color:var(--muted);line-height:1.55}
+  .step b{display:flex;align-items:center;gap:8px;color:var(--ink);font-size:13px;margin-bottom:5px}
+  .step .n{width:20px;height:20px;border-radius:50%;background:var(--accent);color:var(--btn-ink);display:grid;place-items:center;font-size:11px;font-weight:800;flex:0 0 20px}
+  .hint2{font-size:12px;color:var(--muted);margin:14px 0 0;line-height:1.6}
+  .hint2 code{font-family:var(--mono);background:var(--panel-2);padding:1px 6px;border-radius:5px}
 
-  /* scope segmented */
-  .scope{display:inline-flex;gap:2px;padding:3px;background:var(--bg-soft);border:1px solid var(--line-2);border-radius:var(--r-sm)}
-  .scope button{border:0;background:transparent;color:var(--muted);font-family:var(--mono);font-weight:600;font-size:12px;padding:6px 13px;border-radius:4px;cursor:pointer}
-  .scope button:hover{color:var(--ink)} .scope button.on{background:var(--accent);color:var(--accent-ink)}
-
-  /* metric cells */
-  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:11px}
-  @media(max-width:760px){.cards{grid-template-columns:1fr 1fr}}
-  .sc{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px 15px 16px;overflow:hidden;transition:border-color .15s}
-  .sc:hover{border-color:var(--line-3)}
-  .sc .k{font-family:var(--mono);font-size:10px;color:var(--faint);font-weight:600;text-transform:uppercase;letter-spacing:.1em}
-  .sc .v{font-family:var(--mono);font-size:25px;font-weight:700;letter-spacing:-.02em;margin-top:6px}
-  .sc .d{font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:3px}
+  /* KPI cards */
+  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  @media(max-width:980px){.cards{grid-template-columns:repeat(2,1fr)}}
+  .sc{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px 16px;overflow:hidden}
+  .sc .k{font-size:10.5px;color:var(--faint);font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+  .sc .v{font-family:var(--mono);font-size:24px;font-weight:750;letter-spacing:-.02em;margin-top:5px}
+  .sc .d{font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:2px}
   .v.good{color:var(--good)}.v.ok{color:var(--ok)}.v.warn{color:var(--warn)}.v.bad{color:var(--bad)}
-  .sc .spark{position:absolute;right:0;bottom:0;width:46%;height:30px;opacity:.8}
+  .sc .spark{position:absolute;right:0;bottom:0;width:46%;height:30px;opacity:.85}
 
   /* assessment */
-  .averdict{font-family:var(--mono);font-weight:700;font-size:13.5px;margin-bottom:15px;padding:9px 14px;border-radius:var(--r-sm);
-            display:inline-block;border:1px solid transparent}
-  .averdict.good{background:var(--good-bg);color:var(--good);border-color:var(--good)} .averdict.ok{background:var(--ok-bg);color:var(--ok);border-color:var(--ok)}
-  .averdict.warn{background:var(--warn-bg);color:var(--warn);border-color:var(--warn)} .averdict.bad{background:var(--bad-bg);color:var(--bad);border-color:var(--bad)}
+  .averdict{font-weight:800;font-size:14.5px;margin-bottom:13px;padding:9px 15px;border-radius:9px;display:inline-block}
+  .averdict.good{background:var(--good-bg);color:var(--good)} .averdict.ok{background:var(--ok-bg);color:var(--ok)}
+  .averdict.warn{background:var(--warn-bg);color:var(--warn)} .averdict.bad{background:var(--bad-bg);color:var(--bad)}
   .notes-list{list-style:none;margin:0;padding:0}
-  .ni{display:flex;gap:11px;padding:10px 0;font-size:13px;border-top:1px solid var(--line);line-height:1.55}
-  .ni:first-child{border-top:0} .ni .nd{flex:0 0 7px;width:7px;height:7px;border-radius:1px;margin-top:6px;transform:rotate(45deg)}
+  .ni{display:flex;gap:11px;padding:9px 0;font-size:13px;border-top:1px solid var(--line);line-height:1.55}
+  .ni:first-child{border-top:0}
+  .ni .nd{flex:0 0 8px;width:8px;height:8px;border-radius:50%;margin-top:6px}
   .ni.good .nd{background:var(--good)} .ni.warn .nd{background:var(--warn)} .ni.bad .nd{background:var(--bad)} .ni.info .nd{background:var(--accent)}
   .amuted{color:var(--muted)}
 
   /* trend */
-  .trend-insight{font-size:13px;padding:11px 14px;border-radius:var(--r-sm);background:var(--bg-soft);border-left:2px solid var(--accent);margin-bottom:14px}
+  .trend-insight{font-size:13px;padding:11px 14px;border-radius:9px;background:var(--panel-2);border-left:3px solid var(--accent);margin-bottom:13px}
   .trend-insight .bad{color:var(--bad)} .trend-insight .good{color:var(--good)}
-  .trend-insight .ti-d{display:block;margin-top:5px;font-family:var(--mono);font-size:11px;color:var(--faint)}
+  .trend-insight .ti-d{display:block;margin-top:4px;font-family:var(--mono);font-size:11px;color:var(--muted)}
   .trend-insight .ti-muted{color:var(--muted)}
-  .mchips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:15px}
-  .mchip{border:1px solid var(--line-2);background:transparent;color:var(--muted);font-family:var(--mono);font-size:12px;font-weight:600;
-        padding:6px 13px;border-radius:var(--r-sm);cursor:pointer;transition:all .12s}
-  .mchip:hover{color:var(--ink);border-color:var(--line-3)} .mchip.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+  .mchips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:13px}
+  .mchip{border:1px solid var(--line-2);background:transparent;color:var(--muted);font:inherit;font-size:12.5px;font-weight:650;
+        padding:6px 13px;border-radius:999px;cursor:pointer}
+  .mchip:hover{color:var(--ink);border-color:var(--accent)} .mchip.on{background:var(--accent);color:var(--btn-ink);border-color:var(--accent)}
   .chart-box{position:relative} #chart svg{width:100%;height:auto;display:block}
-  #chart .grid{stroke:var(--grid);stroke-width:1} #chart .yl{fill:var(--faint);font-size:9px;font-family:var(--mono);text-anchor:end}
-  #chart .xl{fill:var(--faint);font-size:9px;font-family:var(--mono)} #chart .empty{color:var(--muted);font-size:13px;padding:30px;text-align:center;font-family:var(--mono)}
-  .chart-tip{position:absolute;display:none;pointer-events:none;transform:translate(-50%,-135%);background:var(--ink);color:var(--bg);
-        padding:5px 9px;border-radius:var(--r-sm);font-size:11px;font-family:var(--mono);white-space:nowrap;z-index:5}
-  .chart-tip b{font-weight:800;display:block} .chart-tip span{opacity:.65;font-size:10px}
+  #chart .grid{stroke:var(--grid);stroke-width:1}
+  #chart .yl{fill:var(--faint);font-size:9px;font-family:var(--mono);text-anchor:end}
+  #chart .xl{fill:var(--faint);font-size:9px;font-family:var(--mono)}
+  #chart .empty{color:var(--muted);font-size:13px;padding:30px;text-align:center}
+  .chart-tip{position:absolute;display:none;pointer-events:none;transform:translate(-50%,-135%);background:var(--ink);color:var(--panel);
+        padding:5px 9px;border-radius:7px;font-size:11.5px;font-family:var(--mono);white-space:nowrap;z-index:5}
+  .chart-tip b{font-weight:800;display:block} .chart-tip span{opacity:.7;font-size:10px}
 
-  /* funnel */
+  /* funnel — class .stage CHỈ dùng trong #funnel */
   .funnel{padding:20px}
-  .funnel .verdict{font-size:13px;margin-bottom:17px;padding:11px 14px;border-radius:var(--r-sm);background:var(--bg-soft);border-left:2px solid var(--accent)}
-  .stage{display:grid;grid-template-columns:148px 1fr 84px;align-items:center;gap:14px;margin:8px 0}
-  @media(max-width:620px){.stage{grid-template-columns:104px 1fr}.stage .stage-num{display:none}}
-  .stage .lbl{font-family:var(--mono);font-size:12px;color:var(--muted);font-weight:600}
-  .stage .lbl small{display:block;color:var(--faint);font-weight:400;font-size:11px;margin-top:1px}
-  .bar-track{height:26px;background:var(--bg-soft);border:1px solid var(--line);border-radius:var(--r-sm);overflow:hidden}
-  .bar-fill{height:100%;width:0;border-radius:3px;transition:width .7s cubic-bezier(.2,.7,.2,1);background:linear-gradient(90deg,var(--accent-2),var(--accent))}
-  .stage.weak .bar-fill{background:linear-gradient(90deg,var(--bad),#D14B66)}
-  .stage .stage-num{font-family:var(--mono);font-size:11px;color:var(--faint);text-align:right}
-  .conv{font-family:var(--mono);font-size:11px;color:var(--faint);padding:1px 0 7px 162px} @media(max-width:620px){.conv{padding-left:118px}}
-  .conv.weak{color:var(--bad);font-weight:600}
+  .funnel .verdict{font-size:13px;margin-bottom:16px;padding:11px 14px;border-radius:9px;background:var(--panel-2);border-left:3px solid var(--accent)}
+  .funnel .stage{display:grid;grid-template-columns:150px 1fr 88px;align-items:center;gap:14px;margin:8px 0}
+  @media(max-width:620px){.funnel .stage{grid-template-columns:104px 1fr}.funnel .stage-num{display:none}}
+  .funnel .lbl{font-size:12.5px;color:var(--muted);font-weight:650}
+  .funnel .lbl small{display:block;color:var(--faint);font-weight:400;font-family:var(--mono);font-size:11px}
+  .bar-track{height:28px;background:var(--panel-2);border-radius:7px;overflow:hidden}
+  .bar-fill{height:100%;width:0;border-radius:7px;transition:width .7s cubic-bezier(.2,.7,.2,1);background:linear-gradient(90deg,var(--accent),var(--accent-2))}
+  .funnel .stage.weak .bar-fill{background:linear-gradient(90deg,#F87171,var(--bad))}
+  .funnel .stage-num{font-family:var(--mono);font-size:11px;color:var(--faint);text-align:right}
+  .conv{font-size:11px;color:var(--faint);font-family:var(--mono);padding:1px 0 7px 164px}
+  @media(max-width:620px){.conv{padding-left:118px}}
+  .conv.weak{color:var(--bad);font-weight:700}
 
   /* actions */
-  .act{display:flex;gap:13px;padding:15px;border:1px solid var(--line);border-radius:var(--r);margin-bottom:10px;background:var(--panel)}
-  .act .sev{flex:0 0 3px;border-radius:2px;align-self:stretch}
+  .act{display:flex;gap:13px;padding:15px;border:1px solid var(--line);border-radius:11px;margin-bottom:10px;background:var(--panel)}
+  .act .sev{flex:0 0 4px;border-radius:3px;align-self:stretch}
   .act.bad .sev{background:var(--bad)}.act.warn .sev{background:var(--warn)}.act.ok .sev{background:var(--ok)}
-  .act .who{font-family:var(--mono);font-weight:700;font-size:13px;margin-bottom:6px}
-  .act .who .sp{color:var(--faint);font-weight:400;font-size:11.5px;margin-left:8px}
-  .act p{margin:4px 0;font-size:13px} .act .lab{font-family:var(--mono);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.06em;margin-right:7px}
+  .act .who{font-weight:750;font-size:13.5px;margin-bottom:5px}
+  .act .who .sp{color:var(--faint);font-weight:400;font-family:var(--mono);font-size:11.5px;margin-left:8px}
+  .act p{margin:3px 0;font-size:13px}
+  .act .lab{font-weight:800;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;margin-right:6px}
   .act .lab.p{color:var(--bad)} .act .lab.a{color:var(--accent)} .act .lab.e{color:var(--good)}
 
   /* table */
   .tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--panel)}
-  table{border-collapse:collapse;width:100%;font-size:12.5px;min-width:900px}
+  table{border-collapse:collapse;width:100%;font-size:12.5px;min-width:920px}
   th,td{padding:9px 12px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
-  th{position:sticky;top:0;background:var(--panel-2);font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.06em;
-     color:var(--faint);font-weight:600;cursor:pointer;user-select:none;z-index:1}
+  th{position:sticky;top:0;background:var(--panel-2);font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);
+     font-weight:750;cursor:pointer;user-select:none;z-index:1}
   th:hover{color:var(--accent)}
   th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--panel);max-width:280px;overflow:hidden;text-overflow:ellipsis}
   th:first-child{background:var(--panel-2)}
-  tbody tr:nth-child(even) td{background:color-mix(in srgb,var(--panel) 96%,var(--ink) 4%)}
-  tbody tr:hover td{background:var(--accent-soft)} td.num{font-family:var(--mono)}
-  .chip{display:inline-block;padding:2px 9px;border-radius:4px;font-family:var(--mono);font-size:10.5px;font-weight:700;border:1px solid transparent}
-  .chip.good{background:var(--good-bg);color:var(--good);border-color:var(--good)} .chip.ok{background:var(--ok-bg);color:var(--ok);border-color:var(--ok)}
-  .chip.warn{background:var(--warn-bg);color:var(--warn);border-color:var(--warn)} .chip.bad{background:var(--bad-bg);color:var(--bad);border-color:var(--bad)}
+  tbody tr:nth-child(even) td{background:var(--zebra)}
+  tbody tr:hover td{background:var(--accent-soft)}
+  td.num{font-family:var(--mono)}
+  .chip{display:inline-block;padding:2px 10px;border-radius:999px;font-size:11px;font-weight:750}
+  .chip.good{background:var(--good-bg);color:var(--good)} .chip.ok{background:var(--ok-bg);color:var(--ok)}
+  .chip.warn{background:var(--warn-bg);color:var(--warn)} .chip.bad{background:var(--bad-bg);color:var(--bad)}
   .diag{font-size:11.5px;color:var(--muted);text-align:left;white-space:normal;max-width:290px}
   .caret{display:inline-block;width:12px;color:var(--accent);font-size:10px}
-  td .lv{font-family:var(--mono);font-size:9px;font-weight:700;color:var(--faint);border:1px solid var(--line-2);border-radius:3px;padding:0 4px;margin-right:3px}
-  tr.lv1>td{background:color-mix(in srgb,var(--panel) 88%,var(--accent) 12%)!important}
-  tr.lv2>td{background:color-mix(in srgb,var(--panel) 94%,var(--accent) 6%)!important}
-  .legend{display:flex;gap:15px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:12px}
-  .note{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6}
-
+  td .lv{font-size:9px;font-weight:800;color:var(--faint);border:1px solid var(--line-2);border-radius:4px;padding:0 4px;margin-right:3px;font-family:var(--mono)}
+  tr.lv1>td{background:var(--lv1bg)!important}
+  tr.lv2>td{background:var(--lv2bg)!important}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-top:11px}
+  .note{font-size:12px;color:var(--muted);margin-top:9px;line-height:1.6}
   @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-  @media(max-width:900px){
-    .body{flex-direction:column} .rail{width:auto;flex:none;height:auto;position:static;border-right:0;border-bottom:1px solid var(--line);
-      display:flex;gap:4px;overflow-x:auto;padding:8px}
-    .rail-h{display:none} .rail button{border-left:0;border-bottom:2px solid transparent;white-space:nowrap;width:auto;margin-bottom:0}
-    .rail button.on{border-left:0;border-bottom-color:var(--accent)}
-    .subbar{position:static} .cmdbar{position:static;top:auto} .topbar{position:static}
-  }
 </style>
 </head>
 <body>
-<div class="app">
 
-  <div class="head">
-  <header class="topbar">
-    <div class="brand"><span class="cur">▌</span>JPS<span class="slash">//</span>ADS<small>meta diagnostic terminal</small></div>
-    <div class="topright">
-      <span class="acctPill" id="acctPill">chưa kết nối</span>
-      <button class="iconbtn" id="theme" title="Sáng / tối">☀</button>
-    </div>
-  </header>
-
-  <div class="cmdbar">
-    <span class="prompt">&#10095;</span>
-    <select id="acct" class="grow"><option value="">— nhập token ở tab Cấu hình —</option></select>
+<header class="hdr">
+  <div class="hrow">
+    <div class="brand"><div class="mark">JPS</div><div><b>Ads Console</b><small>Meta diagnostic · chỉ đọc</small></div></div>
+    <span class="acctPill" id="acctPill">chưa kết nối</span>
+    <button class="iconbtn" id="theme" title="Sáng / tối">☾</button>
+  </div>
+  <div class="hrow tools">
+    <select id="acct" class="grow"><option value="">— nhập token ở tab Cài đặt —</option></select>
     <select id="preset">
       <option value="today">Hôm nay</option><option value="yesterday">Hôm qua</option>
       <option value="last_7d" selected>7 ngày qua</option><option value="last_14d">14 ngày qua</option>
@@ -245,125 +218,133 @@
     </select>
     <select id="level">
       <option value="campaign" selected>Campaign (gộp ad set &amp; ad)</option>
-      <option value="adset">Ad Set</option><option value="ad">Ad</option>
+      <option value="adset">Ad Set (bảng phẳng)</option><option value="ad">Ad (bảng phẳng)</option>
     </select>
-    <button class="btn" id="run">&#9654; Phân tích</button>
+    <button class="btn" id="run">Phân tích</button>
   </div>
-  <div class="custom" id="customRange" style="display:none">
+  <div class="hrow" id="customRange" style="display:none">
     <label class="fld" style="flex:1">Từ ngày<input id="since" type="date" /></label>
     <label class="fld" style="flex:1">Đến ngày<input id="until" type="date" /></label>
   </div>
-  </div>
+</header>
 
-  <div class="body">
-    <nav class="rail" id="nav">
-      <div class="rail-h">Sections</div>
-      <button data-p="cfg" class="on"><i>›</i>Cấu hình</button>
-      <button data-p="overview" class="off"><i>›</i>Tổng quan</button>
-      <button data-p="assess" class="off"><i>›</i>Đánh giá</button>
-      <button data-p="trend" class="off"><i>›</i>Xu hướng</button>
-      <button data-p="funnel" class="off"><i>›</i>Phễu</button>
-      <button data-p="actions" class="off"><i>›</i>Đề xuất</button>
-      <button data-p="group" class="off"><i>›</i>Theo nhóm</button>
-      <button data-p="detail" class="off"><i>›</i>Chi tiết</button>
-    </nav>
-
-    <main class="stage">
-      <div class="subbar" id="subbar" style="display:none">
-        <div class="scope" id="scope">
-          <button data-c="" class="on">Tất cả</button><button data-c="online">Online</button><button data-c="o2o">Cửa hàng</button>
-        </div>
-        <span class="flab">Lọc</span>
-        <select id="fStaff"><option value="">Nhân sự: tất cả</option></select>
-        <select id="fPage"><option value="">Page: tất cả</option></select>
-        <select id="fShop"><option value="">Cửa hàng: tất cả</option></select>
-        <button class="btn ghost sm" id="fClear">Xóa lọc</button>
-        <span class="fcount" id="fCount"></span>
-      </div>
-
-      <div class="content">
-        <!-- CFG -->
-        <section class="panel show" data-panel="cfg">
-          <div class="card pad" style="max-width:780px">
-            <h3 class="ph">Kết nối &amp; cấu hình</h3>
-            <div class="grid g2">
-              <label class="fld">Access Token <span class="hint">quyền <code>ads_read</code></span>
-                <input id="token" type="password" placeholder="EAAB..." autocomplete="off" /></label>
-              <label class="fld">Graph API version<input id="ver" value="v23.0" /></label>
-            </div>
-            <h3 class="ph" style="margin-top:22px">Chấm điểm &amp; mục tiêu</h3>
-            <div class="grid g4">
-              <label class="fld">ROAS hòa vốn<span class="hint">1 / biên LN gộp</span><input id="breakeven" type="number" step="0.01" value="3.33" /></label>
-              <label class="fld">CPO mục tiêu<span class="hint">trống = bỏ qua</span><input id="targetCPO" type="number" step="1" placeholder="vd 80000" /></label>
-              <label class="fld">Stop-loss<span class="hint">chi, 0 đơn</span><input id="stoploss" type="number" step="1" placeholder="vd 300000" /></label>
-              <label class="fld">Mục tiêu chính<span class="hint">auto theo objective</span>
-                <select id="goal"><option value="auto" selected>Auto</option><option value="sales">Doanh số</option>
-                <option value="leads">Lead</option><option value="traffic">Traffic</option><option value="awareness">Nhận diện</option></select></label>
-            </div>
-            <label class="chk" style="margin-top:16px"><input id="remember" type="checkbox" /> Nhớ token trong trình duyệt này</label>
-            <p class="hint2">Chạy cục bộ trên máy anh; token chỉ gửi tới Meta. Sau khi nhập token, danh sách tài khoản tải vào ô chọn trên thanh lệnh. Công cụ chỉ <b>đọc</b> dữ liệu — không chỉnh campaign.</p>
-          </div>
-        </section>
-
-        <!-- OVERVIEW -->
-        <section class="panel" data-panel="overview">
-          <div class="phead"><h3 id="sumH">Tổng quan tài khoản</h3><span class="psub" id="sumRange"></span></div>
-          <div class="cards" id="cards"></div>
-        </section>
-
-        <!-- ASSESS -->
-        <section class="panel" data-panel="assess">
-          <div class="phead"><h3>Đánh giá &amp; lưu ý</h3><span class="psub" id="assessScope"></span></div>
-          <div class="card pad"><div id="assess"></div></div>
-        </section>
-
-        <!-- TREND -->
-        <section class="panel" data-panel="trend">
-          <div class="phead"><h3>Xu hướng theo ngày</h3><span class="psub">Đà tăng/giảm &amp; fatigue</span></div>
-          <div class="card pad">
-            <div class="trend-insight" id="trendInsight"></div>
-            <div class="mchips" id="trendChips"></div>
-            <div class="chart-box"><div id="chart"></div><div class="chart-tip" id="chartTip"></div></div>
-          </div>
-        </section>
-
-        <!-- FUNNEL -->
-        <section class="panel" data-panel="funnel">
-          <div class="phead"><h3>Chẩn đoán phễu</h3><span class="psub">Mắt xích nào đang gãy</span></div>
-          <div class="card funnel" id="funnel"></div>
-        </section>
-
-        <!-- ACTIONS -->
-        <section class="panel" data-panel="actions">
-          <div class="phead"><h3>Đề xuất hành động</h3><span class="psub">Ưu tiên theo tác động</span></div>
-          <div id="actions"></div>
-        </section>
-
-        <!-- GROUP -->
-        <section class="panel" data-panel="group">
-          <div class="phead"><h3>Phân tích theo nhóm</h3><span class="psub" id="groupCov"></span></div>
-          <div class="card pad"><div class="mchips" id="groupDims"></div>
-            <div class="tbl-wrap" style="border:1px solid var(--line)"><table id="gtbl"></table></div></div>
-        </section>
-
-        <!-- DETAIL -->
-        <section class="panel" data-panel="detail">
-          <div class="phead"><h3 id="tblH">Chấm điểm chi tiết</h3><span class="psub" id="tblLevel"></span>
-            <button class="btn ghost sm" id="csv">⤓ Xuất CSV</button></div>
-          <div class="tbl-wrap"><table id="tbl"></table></div>
-          <div class="legend">
-            <span><span class="chip good">Tốt</span> ≥80</span><span><span class="chip ok">Khá</span> ≥60</span>
-            <span><span class="chip warn">Cần cải thiện</span> ≥40</span><span><span class="chip bad">Kém</span> &lt;40</span>
-            <span>Trọng số ROAS×3 · CPO×3 · CPM×1</span>
-          </div>
-          <p class="note">Ad set còn <i>học máy</i> (&lt;~50 đơn/tuần) được nới điểm vì dữ liệu chưa đủ tin. Ở cấp Campaign, tick vào dòng để xổ Ad set → Ad.</p>
-        </section>
-      </div>
-    </main>
-  </div>
-
-  <footer class="statusbar"><span class="led"></span><span class="status" id="status">Nhập token ở tab Cấu hình để bắt đầu.</span></footer>
+<div class="tabsbar">
+  <nav class="tabs" id="nav">
+    <button data-p="cfg" class="on">Cài đặt</button>
+    <button data-p="overview" class="off">Tổng quan</button>
+    <button data-p="diag" class="off">Chẩn đoán &amp; đề xuất</button>
+    <button data-p="group" class="off">Theo nhóm</button>
+    <button data-p="detail" class="off">Chi tiết</button>
+    <span class="status" id="status">Nhập token ở tab Cài đặt để bắt đầu.</span>
+  </nav>
 </div>
+
+<div class="subbar" id="subbar" style="display:none">
+  <div class="subin">
+    <div class="scope" id="scope">
+      <button data-c="" class="on">Tất cả</button><button data-c="online">Online</button><button data-c="o2o">Cửa hàng</button>
+    </div>
+    <span class="flab">Lọc</span>
+    <select id="fStaff"><option value="">Nhân sự: tất cả</option></select>
+    <select id="fPage"><option value="">Page: tất cả</option></select>
+    <select id="fShop"><option value="">Cửa hàng: tất cả</option></select>
+    <button class="btn ghost sm" id="fClear">Xóa lọc</button>
+    <span class="fcount" id="fCount"></span>
+  </div>
+</div>
+
+<main class="wrap">
+
+  <!-- ============ CÀI ĐẶT ============ -->
+  <section class="panel show" data-panel="cfg">
+    <div class="phead"><h3>Cài đặt</h3><span class="psub">cấu hình một lần, dùng cho mọi lần phân tích</span></div>
+    <div class="cfg-grid">
+      <div class="card pad">
+        <h4 class="ph">1 · Kết nối Meta</h4>
+        <div class="frm">
+          <label class="fld">Access Token <span class="hint">cần quyền <code>ads_read</code> — token chỉ gửi thẳng tới Meta</span>
+            <input id="token" type="password" placeholder="EAAB..." autocomplete="off" /></label>
+          <div class="frm f2">
+            <label class="fld">Graph API version<input id="ver" value="v23.0" /></label>
+            <label class="fld">&nbsp;<button class="btn ghost" id="loadAcc" style="width:100%">Tải danh sách tài khoản</button></label>
+          </div>
+          <label class="chk"><input id="remember" type="checkbox" /> Nhớ token trong trình duyệt này</label>
+        </div>
+      </div>
+      <div class="card pad">
+        <h4 class="ph">2 · Chấm điểm &amp; mục tiêu</h4>
+        <div class="frm f2">
+          <label class="fld">ROAS hòa vốn<span class="hint">= 1 / biên lợi nhuận gộp</span><input id="breakeven" type="number" step="0.01" value="3.33" /></label>
+          <label class="fld">CPO mục tiêu<span class="hint">trống = bỏ qua</span><input id="targetCPO" type="number" step="1" placeholder="vd 80000" /></label>
+          <label class="fld">Stop-loss<span class="hint">chi từng này mà 0 đơn → DỪNG</span><input id="stoploss" type="number" step="1" placeholder="vd 300000" /></label>
+          <label class="fld">Mục tiêu chính<span class="hint">auto đọc theo objective</span>
+            <select id="goal"><option value="auto" selected>Auto</option><option value="sales">Doanh số</option>
+            <option value="leads">Lead</option><option value="traffic">Traffic</option><option value="awareness">Nhận diện</option></select></label>
+        </div>
+        <p class="hint2">Trọng số: ROAS×3 · CPO×3 · CPM×1 (so trung vị). Campaign &lt;~50 đơn/tuần được coi là <i>đang học máy</i> và nới điểm.</p>
+      </div>
+    </div>
+    <div class="steps">
+      <div class="step"><b><span class="n">1</span>Dán token &amp; tải tài khoản</b>Nhập token rồi bấm "Tải danh sách tài khoản" (hoặc rời khỏi ô nhập) — danh sách đổ vào ô chọn trên thanh đầu trang.</div>
+      <div class="step"><b><span class="n">2</span>Chọn phạm vi &amp; bấm Phân tích</b>Chọn tài khoản (hoặc ★ Tất cả), khoảng ngày, cấp phân tích, rồi bấm <i>Phân tích</i>.</div>
+      <div class="step"><b><span class="n">3</span>Đọc kết quả theo tab</b>Tổng quan → Chẩn đoán &amp; đề xuất → Theo nhóm → Chi tiết (tick dòng campaign để xổ ad set, ad).</div>
+    </div>
+  </section>
+
+  <!-- ============ TỔNG QUAN ============ -->
+  <section class="panel" data-panel="overview">
+    <div class="phead"><h3 id="sumH">Tổng quan tài khoản</h3><span class="psub" id="sumRange"></span></div>
+    <div class="cards" id="cards"></div>
+
+    <div id="blkAssess">
+      <div class="shead"><h4>Đánh giá &amp; lưu ý</h4><span class="psub" id="assessScope"></span></div>
+      <div class="card pad"><div id="assess"></div></div>
+    </div>
+
+    <div id="blkTrend">
+      <div class="shead"><h4>Xu hướng theo ngày</h4><span class="psub">đà tăng/giảm &amp; dấu hiệu fatigue</span></div>
+      <div class="card pad">
+        <div class="trend-insight" id="trendInsight"></div>
+        <div class="mchips" id="trendChips"></div>
+        <div class="chart-box"><div id="chart"></div><div class="chart-tip" id="chartTip"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CHẨN ĐOÁN & ĐỀ XUẤT ============ -->
+  <section class="panel" data-panel="diag">
+    <div class="phead"><h3>Chẩn đoán &amp; đề xuất</h3><span class="psub">mắt xích nào gãy → làm gì</span></div>
+    <div id="blkFunnel">
+      <div class="shead"><h4>Phễu chuyển đổi</h4></div>
+      <div class="card funnel" id="funnel"></div>
+    </div>
+    <div class="shead"><h4>Hành động ưu tiên</h4><span class="psub">xếp theo mức độ ảnh hưởng</span></div>
+    <div id="actions"></div>
+  </section>
+
+  <!-- ============ THEO NHÓM ============ -->
+  <section class="panel" data-panel="group">
+    <div class="phead"><h3>Phân tích theo nhóm</h3><span class="psub" id="groupCov"></span></div>
+    <div class="card pad">
+      <div class="mchips" id="groupDims"></div>
+      <div class="tbl-wrap" style="border:1px solid var(--line)"><table id="gtbl"></table></div>
+    </div>
+  </section>
+
+  <!-- ============ CHI TIẾT ============ -->
+  <section class="panel" data-panel="detail">
+    <div class="phead"><h3 id="tblH">Chấm điểm chi tiết</h3><span class="psub" id="tblLevel"></span>
+      <button class="btn ghost sm" id="csv">Xuất CSV</button></div>
+    <div class="tbl-wrap"><table id="tbl"></table></div>
+    <div class="legend">
+      <span><span class="chip good">Tốt</span> ≥80</span><span><span class="chip ok">Khá</span> ≥60</span>
+      <span><span class="chip warn">Cần cải thiện</span> ≥40</span><span><span class="chip bad">Kém</span> &lt;40</span>
+      <span>Trọng số ROAS×3 · CPO×3 · CPM×1</span>
+    </div>
+    <p class="note">Ở cấp Campaign, tick vào dòng để xổ Ad set → Ad; mỗi cấp được chấm điểm và chẩn đoán riêng. Ad set còn <i>học máy</i> (&lt;~50 đơn/tuần) được nới điểm.</p>
+  </section>
+
+</main>
 <script>
 "use strict";
 const $=id=>document.getElementById(id);
@@ -670,8 +651,8 @@ function renderSingle(){
   ctx.medCPM=med(rows.map(m=>m.cpm));ctx.medCPC=med(rows.map(m=>m.cpc));ctx.medCPL=med(rows.map(m=>m.cpl||0));
   const scored=rows.map(m=>({m,s:score(m,ctx)}));
   renderAssessment(rows,acc,ctx);
-  const showTrend=!active&&series&&series.dates.length>=2;enableNav('trend',showTrend);
-  if(showTrend)renderTrend(series); else if(CURPANEL==='trend')showPanel('overview');
+  const showTrend=!active&&series&&series.dates.length>=2;$('blkTrend').style.display=showTrend?'':'none';
+  if(showTrend)renderTrend(series);
   renderCards(acc,ctx,active?null:series);renderFunnel(acc,ctx);renderActions(scored,ctx);renderTable(scored,ctx);renderGroup(ctx,rows);
   $('sumH').textContent=active?'Tổng quan (đã lọc)':'Tổng quan tài khoản';$('tblH').textContent='Chấm điểm chi tiết';
   $('sumRange').textContent=presetLabel()+' · '+ctx.days+' ngày'+(active?' · đang lọc':'');
@@ -682,7 +663,7 @@ function renderSingle(){
 /* main single */
 async function run(){
   const token=$('token').value.trim(),actId=$('acct').value;
-  if(!token){setStatus('Thiếu access token (mục Cấu hình).',true);showPanel('cfg');return;}
+  if(!token){setStatus('Thiếu access token — vào tab Cài đặt.',true);showPanel('cfg');return;}
   if(!actId){setStatus('Chưa chọn tài khoản.',true);return;}
   const ver=$('ver').value.trim()||'v23.0'; if(actId==='__ALL__')return runAll(token,ver);
   const level=$('level').value,ctx={breakeven:+$('breakeven').value||3.33,targetCPO:+$('targetCPO').value||0,stoploss:+$('stoploss').value||0,days:rangeDays()};
@@ -701,7 +682,8 @@ async function run(){
     let series=null; if(ctx.days>=2){try{setStatus('Đang tải xu hướng theo ngày…');series=await fetchDaily(G,actId,token);}catch(e){series=null;}}
     SINGLE={ctx,accApi:acc,series,level};FILTERS={staff:'',page:'',cuahang:'',channel:''};MODE='single';DATA_LOADED=true;
     populateFilters();document.querySelectorAll('#scope button').forEach((x,i)=>x.classList.toggle('on',i===0));updateFilterUI();
-    ['overview','assess','funnel','actions','group','detail'].forEach(p=>enableNav(p,true));
+    ['overview','diag','group','detail'].forEach(p=>enableNav(p,true));
+    $('blkAssess').style.display='';$('blkFunnel').style.display='';
     renderSingle();showPanel('overview');
     setStatus('Xong — '+ROWS.length+' '+level+', '+F.money(acc.spend,CUR)+' chi tiêu.');
   }catch(e){setStatus('Lỗi: '+e.message+(/token|OAuth|session/i.test(e.message)?' — kiểm tra token & quyền ads_read.':''),true);}
@@ -734,7 +716,9 @@ async function runAll(token,ver){
 function renderMulti(scored,ctx){
   MODE='multi';DATA_LOADED=true;$('acctPill').textContent='Tất cả tài khoản ('+scored.length+')';
   $('sumH').textContent='Tổng quan danh mục';$('tblH').textContent='So sánh tài khoản';
-  ['overview','actions','detail'].forEach(p=>enableNav(p,true));['assess','trend','funnel','group'].forEach(p=>enableNav(p,false));
+  ['overview','diag','detail'].forEach(p=>enableNav(p,true));enableNav('group',false);
+  $('blkAssess').style.display='none';$('blkTrend').style.display='none';$('blkFunnel').style.display='none';
+  if(CURPANEL==='group')showPanel('overview');
   const live=scored.filter(r=>r.m.spend>0),curMap={},revMap={};
   live.forEach(r=>{curMap[r.acc.cur]=(curMap[r.acc.cur]||0)+r.m.spend;revMap[r.acc.cur]=(revMap[r.acc.cur]||0)+r.m.revenue;});
   const curs=Object.keys(curMap).sort((a,b)=>curMap[b]-curMap[a]),mainCur=curs[0]||'VND',more=curs.length>1?'+'+(curs.length-1)+' tiền tệ khác':'&nbsp;';
@@ -777,12 +761,13 @@ $('run').onclick=run;
 $('csv').onclick=()=>window.__csv&&window.__csv();
 $('preset').onchange=()=>$('customRange').style.display=$('preset').value==='custom'?'flex':'none';
 $('token').addEventListener('blur',loadAccounts);
+$('loadAcc').onclick=loadAccounts;
 ['fStaff','fPage','fShop'].forEach(id=>$(id).addEventListener('change',()=>{FILTERS={staff:$('fStaff').value,page:$('fPage').value,cuahang:$('fShop').value,channel:FILTERS.channel};renderSingle();}));
 $('fClear').onclick=()=>{FILTERS={staff:'',page:'',cuahang:'',channel:FILTERS.channel};$('fStaff').value=$('fPage').value=$('fShop').value='';renderSingle();};
 document.querySelectorAll('#scope button').forEach(b=>b.onclick=()=>{FILTERS.channel=b.dataset.c;document.querySelectorAll('#scope button').forEach(x=>x.classList.toggle('on',x===b));updateFilterUI();renderSingle();});
-function setTheme(t){document.documentElement.setAttribute('data-theme',t);$('theme').textContent=t==='dark'?'☀':'☾';localStorage.setItem('jps_theme',t);if(SERIES&&CURPANEL==='trend')drawChart(SERIES,curMetric);}
+function setTheme(t){document.documentElement.setAttribute('data-theme',t);$('theme').textContent=t==='dark'?'☀':'☾';localStorage.setItem('jps_theme',t);if(SERIES)drawChart(SERIES,curMetric);}
 $('theme').onclick=()=>setTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');
-setTheme(localStorage.getItem('jps_theme')||'dark');
+setTheme(localStorage.getItem('jps_theme')||'light');
 const saved=localStorage.getItem('jps_tok');if(saved){$('token').value=saved;$('remember').checked=true;loadAccounts();}
 </script>
 </body>
