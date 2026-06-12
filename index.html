@@ -146,6 +146,8 @@ tfoot td{position:sticky;bottom:0;background:#F7F8FA;border-top:2px solid var(--
     </select>
     <span id="customRange" class="hide"><input type="date" id="dateSince"> → <input type="date" id="dateUntil"></span>
     <button class="btn primary" id="btnLoad">Tải dữ liệu</button>
+    <button class="btn" id="btnAuto" title="Tự động tải lại số liệu định kỳ. Lưu ý: số liệu Insights phía Meta có độ trễ vài phút.">⟳ Tắt</button>
+    <span class="small muted" id="lastUpd"></span>
     <button class="btn" id="btnDemo">Dữ liệu mẫu</button>
     <button class="btn" id="btnStaff">👥 Hiệu suất nhân sự</button>
     <button class="btn" id="btnSettings">⚙</button>
@@ -237,7 +239,7 @@ const DEFAULT_BENCH={
   Engage:{cpr:{label:'Chi phí/tương tác (đ)',good:500,bad:3000,w:3,dir:'down'},cpm:{label:'CPM (đ)',good:40000,bad:120000,w:1,dir:'down'}},
   Reach:{cpm:{label:'CPM (đ)',good:30000,bad:80000,w:3,dir:'down'},freq:{label:'Frequency',good:2.5,bad:5,w:1,dir:'down'}},
   LDP:{cpr:{label:'Chi phí/LPV (đ)',good:5000,bad:15000,w:3,dir:'down'},ctr:{label:'CTR (%)',good:1.5,bad:0.6,w:1,dir:'up'}}};
-const DEFAULT_CFG={token:'',selAcc:'',learningMin:50,exclLearn:true,stoploss:500000};
+const DEFAULT_CFG={token:'',selAcc:'',learningMin:50,exclLearn:true,stoploss:500000,autoRefresh:0};
 
 let CFG=loadJSON('jps_ads_cfg',DEFAULT_CFG);
 let BENCH=loadJSON('jps_ads_bench',DEFAULT_BENCH);
@@ -389,6 +391,10 @@ function renderAccSelect(){
   sel.classList.remove('hide');
 }
 const INS_FIELDS='spend,impressions,reach,frequency,clicks,inline_link_clicks,actions,action_values';
+const EDGE={campaign:'campaigns',adset:'adsets',ad:'ads'};
+const ENT_EXTRA={campaign:'objective,daily_budget,lifetime_budget',adset:'campaign_id,daily_budget,lifetime_budget',ad:'adset_id,campaign_id'};
+const SCOPED={adset:new Set(),ad:new Set()}; // các campaign đã tải scoped
+let lastRefresh=null;
 async function fetchAll(url){
   let out=[];
   while(url){
@@ -399,24 +405,53 @@ async function fetchAll(url){
   }
   return out;
 }
-async function loadLevel(level){
+function trParam(){
   const r=getRange();
   if(!r.since||!r.until)throw new Error('Khoảng thời gian không hợp lệ');
-  const tr=encodeURIComponent(JSON.stringify({since:r.since,until:r.until}));
-  const edge=level==='campaign'?'campaigns':level==='adset'?'adsets':'ads';
-  const extra=level==='campaign'?'objective,daily_budget,lifetime_budget':level==='adset'?'campaign_id,daily_budget,lifetime_budget':'adset_id,campaign_id';
-  let ents=[];
-  for(const acc of accounts()){
-    const url=`https://graph.facebook.com/v23.0/${acc}/${edge}?fields=id,name,status,effective_status,${extra},insights.time_range(${tr}){${INS_FIELDS}}&limit=150&access_token=${encodeURIComponent(CFG.token)}`;
-    ents=ents.concat(await fetchAll(url));
-  }
+  return encodeURIComponent(JSON.stringify({since:r.since,until:r.until}));
+}
+/* Lấy 1 cấp: 2 call song song (insights theo level + metadata entity) rồi join theo id.
+   base = act_xxx (toàn tài khoản) hoặc campaign_id (phạm vi 1 chiến dịch — nhanh). */
+async function fetchLevel(base,level,tr){
+  const idF=level+'_id',nameF=level+'_name';
+  const extraIns=(level!=='campaign'?'campaign_id,':'')+(level==='ad'?'adset_id,':'');
+  const tok=encodeURIComponent(CFG.token);
+  const insUrl=`https://graph.facebook.com/v23.0/${base}/insights?level=${level}&fields=${idF},${nameF},${extraIns}${INS_FIELDS}&time_range=${tr}&limit=500&access_token=${tok}`;
+  const entUrl=`https://graph.facebook.com/v23.0/${base}/${EDGE[level]}?fields=id,name,status,effective_status,${ENT_EXTRA[level]}&limit=500&access_token=${tok}`;
+  const [ins,ents]=await Promise.all([fetchAll(insUrl),fetchAll(entUrl)]);
+  const meta={};ents.forEach(e=>meta[e.id]=e);
+  // chỉ build từ entity CÓ dữ liệu trong kỳ → bỏ qua hàng loạt ads cũ không chạy
+  return ins.map(row=>{
+    const id=row[idF],m=meta[id]||{};
+    return {id,name:row[nameF]||m.name||'',status:m.status,effective_status:m.effective_status,
+      objective:m.objective,daily_budget:m.daily_budget,lifetime_budget:m.lifetime_budget,
+      campaign_id:row.campaign_id||m.campaign_id,adset_id:row.adset_id||m.adset_id,
+      insights:{data:[row]}};
+  });
+}
+async function loadLevel(level){
+  const tr=trParam();
+  const lists=await Promise.all(accounts().map(acc=>fetchLevel(acc,level,tr)));
+  const ents=lists.flat();
   if(level==='campaign'){
     DATA.campaign=ents.map(e=>buildRow('campaign',e,null));
     CAMP_MAP={};DATA.campaign.forEach(c=>CAMP_MAP[c.id]=c);
+    SCOPED.adset.clear();SCOPED.ad.clear();
+    if(!LOADED.adset)DATA.adset=[];
+    if(!LOADED.ad)DATA.ad=[];
   }else{
     DATA[level]=ents.map(e=>buildRow(level,e,CAMP_MAP[e.campaign_id]||null));
   }
   LOADED[level]=true;
+  lastRefresh=new Date();
+}
+async function loadScoped(level,campId){
+  const tr=trParam();
+  const ents=await fetchLevel(campId,level,tr);
+  DATA[level]=DATA[level].filter(r=>r.campaign_id!==campId)
+    .concat(ents.map(e=>buildRow(level,e,CAMP_MAP[campId]||null)));
+  SCOPED[level].add(campId);
+  lastRefresh=new Date();
 }
 async function reloadAll(){
   if(!CFG.token){showBanner('err','Chưa có token — vào ⚙ để nhập.');openSettings();return;}
@@ -424,11 +459,12 @@ async function reloadAll(){
   try{
     if(!ACCOUNTS.length){showBanner('info','Đang lấy danh sách tài khoản quảng cáo…');await loadAccounts();}
     LOADED.campaign=LOADED.adset=LOADED.ad=false;
+    SCOPED.adset.clear();SCOPED.ad.clear();
     DATA.campaign=[];DATA.adset=[];DATA.ad=[];SEL_CAMP=null;SEL_ADSET=null;drawerRow=null;
     $('#drawer').classList.remove('open');
     showBanner('info','Đang tải chiến dịch…');
     await loadLevel('campaign');
-    if(LEVEL!=='campaign')await loadLevel(LEVEL);
+    if(LEVEL!=='campaign')await ensureLevel(LEVEL);
     showBanner(null);render();
   }catch(e){showBanner('err','Lỗi: '+e.message+' — kiểm tra token (ads_read), account ID hoặc mạng.');}
   finally{btn.disabled=false;btn.textContent='Tải dữ liệu';}
@@ -437,8 +473,15 @@ async function ensureLevel(level){
   if(LOADED[level]||demoMode)return;
   if(!CFG.token||!ACCOUNTS.length)return;
   if(!LOADED.campaign)await loadLevel('campaign');
-  showBanner('info','Đang tải '+(level==='adset'?'nhóm quảng cáo':'quảng cáo')+'…');
-  await loadLevel(level);
+  const scopeCamp=level==='ad'&&SEL_ADSET?SEL_ADSET.campaign_id:(SEL_CAMP?SEL_CAMP.id:null);
+  if(scopeCamp){
+    if(SCOPED[level].has(scopeCamp))return;
+    showBanner('info','Đang tải nhanh trong phạm vi chiến dịch…');
+    await loadScoped(level,scopeCamp);
+  }else{
+    showBanner('info','Đang tải toàn bộ '+(level==='adset'?'nhóm quảng cáo':'quảng cáo')+' của tài khoản…');
+    await loadLevel(level);
+  }
   showBanner(null);
 }
 
@@ -505,8 +548,9 @@ function ringHTML(s,size,inner){
 }
 function render(){
   $('#cntCampaign').textContent=DATA.campaign.length;
-  $('#cntAdset').textContent=(LOADED.adset||demoMode)?DATA.adset.length:'…';
-  $('#cntAd').textContent=(LOADED.ad||demoMode)?DATA.ad.length:'…';
+  $('#cntAdset').textContent=(LOADED.adset||demoMode)?DATA.adset.length:(SCOPED.adset.size?DATA.adset.length+'+':'…');
+  $('#cntAd').textContent=(LOADED.ad||demoMode)?DATA.ad.length:(SCOPED.ad.size?DATA.ad.length+'+':'…');
+  $('#lastUpd').textContent=lastRefresh?'Cập nhật '+lastRefresh.toLocaleTimeString('vi-VN'):'';
   const cr=$('#crumb');
   if(SEL_CAMP||SEL_ADSET){
     cr.style.display='flex';
@@ -717,6 +761,37 @@ function loadDemo(){
   render();
 }
 
+/* ============ TỰ LÀM MỚI ============ */
+let refreshTimer=null,refreshing=false;
+const AUTO_STEPS=[0,60,300];
+function setAutoRefresh(sec){
+  CFG.autoRefresh=sec;saveJSON('jps_ads_cfg',CFG);
+  if(refreshTimer){clearInterval(refreshTimer);refreshTimer=null;}
+  const b=$('#btnAuto');
+  b.textContent=sec?'⟳ '+(sec<120?sec+' giây':(sec/60)+' phút'):'⟳ Tắt';
+  b.classList.toggle('primary',!!sec);
+  if(sec)refreshTimer=setInterval(silentRefresh,sec*1000);
+}
+async function silentRefresh(){
+  if(demoMode||refreshing||!CFG.token||!ACCOUNTS.length||!LOADED.campaign)return;
+  refreshing=true;
+  try{
+    await loadLevel('campaign');
+    if(SEL_CAMP)SEL_CAMP=CAMP_MAP[SEL_CAMP.id]||null;
+    if(LEVEL!=='campaign'){
+      if(LOADED[LEVEL])await loadLevel(LEVEL);
+      else{
+        const sc=LEVEL==='ad'&&SEL_ADSET?SEL_ADSET.campaign_id:(SEL_CAMP?SEL_CAMP.id:null);
+        if(sc)await loadScoped(LEVEL,sc);
+      }
+      if(SEL_ADSET)SEL_ADSET=DATA.adset.find(a=>a.id===SEL_ADSET.id)||SEL_ADSET;
+    }
+    if(drawerRow){const nr=(DATA[drawerRow.level]||[]).find(x=>x.id===drawerRow.id);if(nr)drawerRow=nr,openDrawer(nr);}
+    render();
+  }catch(e){/* lần sau thử lại, không làm phiền */}
+  finally{refreshing=false;}
+}
+
 /* ============ EVENTS ============ */
 function showBanner(t,m){const b=$('#banner');if(!t){b.className='banner';b.textContent='';return;}b.className='banner '+t;b.textContent=m;}
 async function switchTab(level){
@@ -732,6 +807,10 @@ $('#accSelect').addEventListener('change',e=>{
 });
 $('#datePreset').addEventListener('change',e=>$('#customRange').classList.toggle('hide',e.target.value!=='custom'));
 $('#btnLoad').addEventListener('click',()=>{demoMode=false;reloadAll();});
+$('#btnAuto').addEventListener('click',()=>{
+  const i=AUTO_STEPS.indexOf(CFG.autoRefresh||0);
+  setAutoRefresh(AUTO_STEPS[(i+1)%AUTO_STEPS.length]);
+});
 $('#btnDemo').addEventListener('click',loadDemo);
 $('#btnStaff').addEventListener('click',openStaff);
 $('#btnSettings').addEventListener('click',openSettings);
@@ -749,6 +828,7 @@ $$('[data-close]').forEach(b=>b.addEventListener('click',()=>b.closest('.overlay
 $$('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.add('hide');}));
 STAFF.forEach(s=>$('#fStaff').insertAdjacentHTML('beforeend',`<option>${s.name}</option>`));
 HT_KEYS.forEach(k=>$('#fHt').insertAdjacentHTML('beforeend',`<option value="${k}">${k} — ${HINH_THUC[k].label}</option>`));
+setAutoRefresh(CFG.autoRefresh||0);
 render();
 </script>
 </body>
