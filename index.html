@@ -135,6 +135,7 @@ tfoot td{position:sticky;bottom:0;background:#F7F8FA;border-top:2px solid var(--
   <div class="topbar">
     <div class="logo"><b>JPS</b> Ads Manager<span>quản lý + đánh giá hiệu suất · chế độ chỉ đọc</span></div>
     <div class="grow"></div>
+    <select id="accSelect" class="hide" title="Tài khoản quảng cáo"></select>
     <select id="datePreset">
       <option value="last_7d">7 ngày qua</option>
       <option value="last_14d">14 ngày qua</option>
@@ -189,8 +190,7 @@ tfoot td{position:sticky;bottom:0;background:#F7F8FA;border-top:2px solid var(--
     <h3>Cài đặt <button class="btn" data-close>✕</button></h3>
     <h4>Kết nối Meta Marketing API (chỉ đọc)</h4>
     <div class="formrow"><label for="cfgToken">Access token</label><input type="password" id="cfgToken" placeholder="System User token — quyền ads_read">
-      <div class="hint">Token chỉ lưu trong localStorage trình duyệt này. App không gọi bất kỳ thao tác ghi nào (bật/tắt, đổi ngân sách).</div></div>
-    <div class="formrow"><label for="cfgAccount">Ad Account ID</label><input type="text" id="cfgAccount" placeholder="1234567890 — nhiều tài khoản cách nhau dấu phẩy"></div>
+      <div class="hint">Token chỉ lưu trong localStorage trình duyệt này. App tự lấy danh sách tài khoản quảng cáo mà token truy cập được — chọn tài khoản ở thanh trên cùng. App không gọi bất kỳ thao tác ghi nào (bật/tắt, đổi ngân sách).</div></div>
     <h4>Quy tắc chấm</h4>
     <div class="formrow"><label for="cfgLearning">Ngưỡng LEARNING (kết quả tối thiểu)</label><input type="number" id="cfgLearning" min="0" style="width:110px"></div>
     <div class="formrow"><label for="cfgExclLearn">Loại LEARNING khỏi điểm nhân sự</label><input type="checkbox" id="cfgExclLearn" style="width:auto;justify-self:start"></div>
@@ -237,7 +237,7 @@ const DEFAULT_BENCH={
   Engage:{cpr:{label:'Chi phí/tương tác (đ)',good:500,bad:3000,w:3,dir:'down'},cpm:{label:'CPM (đ)',good:40000,bad:120000,w:1,dir:'down'}},
   Reach:{cpm:{label:'CPM (đ)',good:30000,bad:80000,w:3,dir:'down'},freq:{label:'Frequency',good:2.5,bad:5,w:1,dir:'down'}},
   LDP:{cpr:{label:'Chi phí/LPV (đ)',good:5000,bad:15000,w:3,dir:'down'},ctr:{label:'CTR (%)',good:1.5,bad:0.6,w:1,dir:'up'}}};
-const DEFAULT_CFG={token:'',account:'',learningMin:50,exclLearn:true,stoploss:500000};
+const DEFAULT_CFG={token:'',selAcc:'',learningMin:50,exclLearn:true,stoploss:500000};
 
 let CFG=loadJSON('jps_ads_cfg',DEFAULT_CFG);
 let BENCH=loadJSON('jps_ads_bench',DEFAULT_BENCH);
@@ -369,7 +369,25 @@ function getRange(){
   const days=p==='last_7d'?7:p==='last_14d'?14:30;
   return{since:iso(ago(days)),until:iso(now)};
 }
-function accounts(){return CFG.account.split(',').map(a=>a.trim()).filter(Boolean).map(a=>a.startsWith('act_')?a:'act_'+a);}
+let ACCOUNTS=[]; // [{id:'act_x',name}] tự lấy từ token
+function accounts(){
+  if(CFG.selAcc)return [CFG.selAcc];
+  return ACCOUNTS.map(a=>a.id);
+}
+async function loadAccounts(){
+  const url=`https://graph.facebook.com/v23.0/me/adaccounts?fields=id,name,account_status&limit=200&access_token=${encodeURIComponent(CFG.token)}`;
+  ACCOUNTS=(await fetchAll(url)).map(a=>({id:a.id,name:a.name||a.id}));
+  if(!ACCOUNTS.length)throw new Error('Token không truy cập được tài khoản quảng cáo nào');
+  if(CFG.selAcc&&!ACCOUNTS.some(a=>a.id===CFG.selAcc))CFG.selAcc='';
+  renderAccSelect();
+}
+function renderAccSelect(){
+  const sel=$('#accSelect');
+  if(!ACCOUNTS.length){sel.classList.add('hide');return;}
+  sel.innerHTML='<option value="">Tất cả tài khoản ('+ACCOUNTS.length+')</option>'+
+    ACCOUNTS.map(a=>`<option value="${a.id}" ${CFG.selAcc===a.id?'selected':''}>${esc(a.name)}</option>`).join('');
+  sel.classList.remove('hide');
+}
 const INS_FIELDS='spend,impressions,reach,frequency,clicks,inline_link_clicks,actions,action_values';
 async function fetchAll(url){
   let out=[];
@@ -401,9 +419,10 @@ async function loadLevel(level){
   LOADED[level]=true;
 }
 async function reloadAll(){
-  if(!CFG.token||!CFG.account){showBanner('err','Chưa có token hoặc Ad Account ID — vào ⚙ để nhập.');openSettings();return;}
+  if(!CFG.token){showBanner('err','Chưa có token — vào ⚙ để nhập.');openSettings();return;}
   const btn=$('#btnLoad');btn.disabled=true;btn.innerHTML='<span class="spin"></span>Đang tải…';
   try{
+    if(!ACCOUNTS.length){showBanner('info','Đang lấy danh sách tài khoản quảng cáo…');await loadAccounts();}
     LOADED.campaign=LOADED.adset=LOADED.ad=false;
     DATA.campaign=[];DATA.adset=[];DATA.ad=[];SEL_CAMP=null;SEL_ADSET=null;drawerRow=null;
     $('#drawer').classList.remove('open');
@@ -416,7 +435,7 @@ async function reloadAll(){
 }
 async function ensureLevel(level){
   if(LOADED[level]||demoMode)return;
-  if(!CFG.token||!CFG.account)return;
+  if(!CFG.token||!ACCOUNTS.length)return;
   if(!LOADED.campaign)await loadLevel('campaign');
   showBanner('info','Đang tải '+(level==='adset'?'nhóm quảng cáo':'quảng cáo')+'…');
   await loadLevel(level);
@@ -610,7 +629,7 @@ function openStaff(){
 
 /* ============ SETTINGS ============ */
 function openSettings(){
-  $('#cfgToken').value=CFG.token;$('#cfgAccount').value=CFG.account;
+  $('#cfgToken').value=CFG.token;
   $('#cfgLearning').value=CFG.learningMin;$('#cfgExclLearn').checked=CFG.exclLearn;$('#cfgStoploss').value=CFG.stoploss;
   let html='<thead><tr><th>Hình thức</th><th>Chỉ số</th><th>Tốt</th><th>Kém</th><th>×</th></tr></thead><tbody>';
   for(const ht in BENCH){const ks=Object.keys(BENCH[ht]);
@@ -623,7 +642,9 @@ function openSettings(){
   $('#setOverlay').classList.remove('hide');
 }
 function saveSettings(){
-  CFG.token=$('#cfgToken').value.trim();CFG.account=$('#cfgAccount').value.trim();
+  const newToken=$('#cfgToken').value.trim();
+  if(newToken!==CFG.token){ACCOUNTS=[];CFG.selAcc='';$('#accSelect').classList.add('hide');}
+  CFG.token=newToken;
   CFG.learningMin=+$('#cfgLearning').value||0;CFG.exclLearn=$('#cfgExclLearn').checked;CFG.stoploss=+$('#cfgStoploss').value||0;
   $$('[data-bm]').forEach(inp=>{const[ht,k,f]=inp.dataset.bm.split('.');BENCH[ht][k][f]=+inp.value;});
   saveJSON('jps_ads_cfg',CFG);saveJSON('jps_ads_bench',BENCH);
@@ -705,6 +726,10 @@ async function switchTab(level){
   render();
 }
 $$('.tab').forEach(t=>t.addEventListener('click',()=>switchTab(t.dataset.level)));
+$('#accSelect').addEventListener('change',e=>{
+  CFG.selAcc=e.target.value;saveJSON('jps_ads_cfg',CFG);
+  if(!demoMode)reloadAll();
+});
 $('#datePreset').addEventListener('change',e=>$('#customRange').classList.toggle('hide',e.target.value!=='custom'));
 $('#btnLoad').addEventListener('click',()=>{demoMode=false;reloadAll();});
 $('#btnDemo').addEventListener('click',loadDemo);
