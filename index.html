@@ -3,638 +3,449 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>JPS Ads Console — Đánh giá Meta Ads</title>
+<title>JPS Ads Console</title>
 <style>
   :root{
-    --bg:#0E1014; --surface:#161922; --surface-2:#1E222D;
-    --ink:#E8EAF0; --muted:#9AA1B2; --faint:#5E6576;
-    --line:#262B38; --line-strong:#333A4B;
-    --accent:#6178FF; --accent-ink:#8395FF;
-    --good:#34D399; --good-bg:rgba(52,211,153,.15);
-    --ok:#FBBF24;   --ok-bg:rgba(251,191,36,.15);
-    --warn:#FB923C; --warn-bg:rgba(251,146,60,.15);
-    --bad:#F87171;  --bad-bg:rgba(248,113,113,.15);
-    --grid:rgba(255,255,255,.07);
-    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.32);
-    --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+    --bg:#0A0C10; --bg-soft:#0D1016; --panel:#10141B; --panel-2:#161B23; --raise:#1A2029;
+    --ink:#E7ECF2; --muted:#8C95A3; --faint:#5A6472;
+    --line:#1B212B; --line-2:#2A3340; --line-3:#3A4452;
+    --accent:#A3E635; --accent-2:#BEF264; --accent-soft:rgba(163,230,53,.13); --accent-ink:#10140A;
+    --good:#6EE7A8; --good-bg:rgba(110,231,168,.13); --ok:#E3C766; --ok-bg:rgba(227,199,102,.13);
+    --warn:#F0A35E; --warn-bg:rgba(240,163,94,.14); --bad:#F2768D; --bad-bg:rgba(242,118,141,.14);
+    --grid:rgba(255,255,255,.05);
+    --mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
     --ui:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-    --r:14px;
+    --r:7px; --r-sm:5px;
   }
   html[data-theme="light"]{
-    --bg:#F6F7FA; --surface:#FFFFFF; --surface-2:#F0F2F7;
-    --ink:#141821; --muted:#5C6475; --faint:#9AA0AC;
-    --line:#E7E9EF; --line-strong:#D6DAE3;
-    --accent:#2742E6; --accent-ink:#1B2EA8;
-    --good:#15803D; --good-bg:#E7F6EC; --ok:#B7791F; --ok-bg:#FBF2DA;
-    --warn:#C2410C; --warn-bg:#FBEADF; --bad:#DC2626; --bad-bg:#FBE5E5;
-    --grid:rgba(16,18,29,.07);
-    --shadow:0 1px 2px rgba(16,18,29,.05),0 8px 24px rgba(16,18,29,.07);
+    --bg:#F1EFE7; --bg-soft:#EDEAE0; --panel:#FBFAF5; --panel-2:#F3F1E9; --raise:#FFFFFF;
+    --ink:#1A1D22; --muted:#5C6470; --faint:#94999F;
+    --line:#E0DCD0; --line-2:#CFCABB; --line-3:#BCB6A4;
+    --accent:#4D7C0F; --accent-2:#3F6B0A; --accent-soft:rgba(77,124,15,.12); --accent-ink:#FFFFFF;
+    --good:#15803D; --good-bg:rgba(21,128,61,.10); --ok:#A16207; --ok-bg:rgba(161,98,7,.10);
+    --warn:#C2410C; --warn-bg:rgba(194,65,12,.10); --bad:#BE123C; --bad-bg:rgba(190,18,60,.10);
+    --grid:rgba(0,0,0,.06);
   }
   *{box-sizing:border-box}
+  html,body{height:100%}
   body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ui);font-size:14px;line-height:1.5;
-       -webkit-font-smoothing:antialiased;transition:background .25s,color .25s}
-  a{color:var(--accent)}
-  .wrap{max-width:1200px;margin:0 auto;padding:0 20px 90px}
+       -webkit-font-smoothing:antialiased;transition:background .2s,color .2s}
+  h1,h2,h3{margin:0;letter-spacing:-.01em}
+  ::selection{background:var(--accent);color:var(--accent-ink)}
+  .mono{font-family:var(--mono)}
 
-  /* App bar */
-  .appbar{display:flex;align-items:center;gap:14px;padding:18px 0 16px;flex-wrap:wrap}
-  .logo{display:flex;align-items:center;gap:11px}
-  .mark{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--accent),#A78BFA);
-        display:grid;place-items:center;color:#fff;font-weight:900;font-size:15px;letter-spacing:-.03em;box-shadow:0 4px 14px rgba(97,120,255,.4)}
-  .logo b{font-weight:800;letter-spacing:-.02em;font-size:18px}
-  .logo small{display:block;color:var(--muted);font-size:11px;font-family:var(--mono);margin-top:-1px}
-  .bar-right{margin-left:auto;display:flex;align-items:center;gap:10px}
-  .acct-pill{font-size:12px;color:var(--muted);background:var(--surface);border:1px solid var(--line);
-             border-radius:999px;padding:6px 13px;font-family:var(--mono)}
-  .iconbtn{width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:var(--surface);
-           color:var(--ink);cursor:pointer;font-size:15px;display:grid;place-items:center;transition:background .15s}
-  .iconbtn:hover{background:var(--surface-2)}
+  /* ---- app frame ---- */
+  .app{min-height:100vh;display:flex;flex-direction:column}
+  .head{position:sticky;top:0;z-index:30;background:var(--bg-soft)}
 
-  /* Card */
-  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
-  .config{padding:18px}
-  .grid{display:grid;gap:14px}
-  .g4{grid-template-columns:repeat(4,1fr)} .g3{grid-template-columns:repeat(3,1fr)}
-  @media(max-width:860px){.g4,.g3{grid-template-columns:1fr 1fr}}
-  @media(max-width:520px){.g4,.g3{grid-template-columns:1fr}}
-  label.fld{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--muted);font-weight:600}
-  label.fld .hint{font-weight:400;color:var(--faint);font-size:11px}
-  input,select{font:inherit;font-size:13.5px;padding:10px 12px;border:1px solid var(--line-strong);border-radius:10px;
-        background:var(--bg);color:var(--ink);width:100%}
-  html[data-theme="light"] input,html[data-theme="light"] select{background:var(--surface)}
-  input:focus,select:focus{outline:2px solid var(--accent);outline-offset:-1px;border-color:var(--accent)}
+  /* top bar */
+  .topbar{display:flex;align-items:center;gap:14px;padding:11px 18px;background:var(--bg-soft);
+          border-bottom:1px solid var(--line)}
+  .brand{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-weight:800;letter-spacing:.02em;font-size:15px}
+  .brand .cur{color:var(--accent);animation:blink 1.15s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+  .brand .slash{color:var(--accent);font-weight:700}
+  .brand small{font-family:var(--mono);font-weight:400;font-size:10.5px;color:var(--faint);margin-left:8px;letter-spacing:.04em;text-transform:uppercase}
+  .topright{margin-left:auto;display:flex;align-items:center;gap:10px}
+  .acctPill{font-family:var(--mono);font-size:11.5px;color:var(--muted);background:var(--panel);border:1px solid var(--line-2);
+            padding:5px 11px;border-radius:999px;max-width:340px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .acctPill::before{content:"◍ ";color:var(--accent)}
+  .iconbtn{width:32px;height:32px;border-radius:var(--r-sm);border:1px solid var(--line-2);background:var(--panel);
+           color:var(--ink);cursor:pointer;font-size:14px;display:grid;place-items:center}
+  .iconbtn:hover{border-color:var(--accent);color:var(--accent)}
+
+  /* command bar */
+  .cmdbar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;padding:11px 18px;background:var(--panel);
+          border-bottom:1px solid var(--line)}
+  .cmdbar .prompt{font-family:var(--mono);font-weight:800;color:var(--accent);font-size:16px;line-height:1}
+  .cmdbar .grow{flex:1;min-width:170px}
+  .cmdbar select{min-width:122px}
+  .custom{display:flex;gap:10px;padding:10px 18px;background:var(--panel);border-bottom:1px solid var(--line)}
+
+  /* body split */
+  .body{display:flex;align-items:stretch;flex:1}
+  .rail{width:206px;flex:0 0 206px;background:var(--bg-soft);border-right:1px solid var(--line);padding:14px 12px}
+  .rail-h{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);
+          padding:4px 10px 9px;border-bottom:1px solid var(--line);margin-bottom:7px}
+  .rail button{display:flex;align-items:center;gap:9px;width:100%;border:0;background:transparent;color:var(--muted);
+        font-family:var(--mono);font-weight:500;font-size:13px;text-align:left;padding:9px 11px;border-radius:var(--r-sm);
+        cursor:pointer;border-left:2px solid transparent;transition:all .12s;margin-bottom:1px}
+  .rail button i{font-style:normal;color:var(--faint);font-size:12px}
+  .rail button:hover{background:var(--panel-2);color:var(--ink)}
+  .rail button.on{background:var(--accent-soft);color:var(--accent);border-left-color:var(--accent)}
+  .rail button.on i{color:var(--accent)}
+  .rail button.off{display:none}
+
+  .stage{flex:1;min-width:0;display:flex;flex-direction:column}
+  .subbar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;padding:11px 22px;background:var(--bg-soft);border-bottom:1px solid var(--line)}
+  .subbar .flab{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-left:6px}
+  .subbar select{min-width:150px} .subbar select:disabled{opacity:.4}
+  .fcount{font-family:var(--mono);font-size:12px;color:var(--accent);font-weight:600}
+  .content{padding:22px 22px 40px;max-width:1240px;width:100%}
+
+  .panel{display:none;animation:fade .22s ease} .panel.show{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .phead{display:flex;align-items:baseline;gap:12px;margin-bottom:16px;padding-bottom:11px;border-bottom:1px solid var(--line)}
+  .phead h3{font-family:var(--mono);font-size:15px;font-weight:700;letter-spacing:.01em}
+  .phead h3::before{content:"// ";color:var(--accent);font-weight:800}
+  .phead .psub{font-family:var(--mono);font-size:11.5px;color:var(--faint)}
+  .phead .btn.sm{margin-left:auto}
+
+  /* status bar */
+  .statusbar{display:flex;align-items:center;gap:10px;padding:8px 18px;background:var(--bg-soft);border-top:1px solid var(--line);
+             position:sticky;bottom:0;z-index:30}
+  .statusbar .led{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 0 var(--accent);animation:pulse 2s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 var(--accent-soft)}70%{box-shadow:0 0 0 6px transparent}100%{box-shadow:0 0 0 0 transparent}}
+  .status{font-family:var(--mono);font-size:12px;color:var(--muted)} .status.err{color:var(--bad)}
+  .statusbar:has(.status.err) .led{background:var(--bad)}
+
+  /* ---- cards / form ---- */
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r)}
+  .pad{padding:20px}
+  .ph{font-family:var(--mono);font-size:13px;font-weight:700;margin-bottom:15px;padding-bottom:11px;border-bottom:1px solid var(--line);
+      letter-spacing:.02em;text-transform:uppercase;color:var(--muted)}
+  .ph::before{content:"› ";color:var(--accent)}
+  .grid{display:grid;gap:13px} .g4{grid-template-columns:repeat(4,1fr)} .g3{grid-template-columns:repeat(3,1fr)} .g2{grid-template-columns:1fr 1fr}
+  @media(max-width:760px){.g4,.g3,.g2{grid-template-columns:1fr 1fr}}
+  label.fld{display:flex;flex-direction:column;gap:6px;font-family:var(--mono);font-size:11px;color:var(--muted);font-weight:600;
+            text-transform:uppercase;letter-spacing:.04em}
+  label.fld .hint{font-weight:400;color:var(--faint);font-size:10.5px;text-transform:none;letter-spacing:0}
+  input,select{font-family:var(--mono);font-size:13px;padding:9px 11px;border:1px solid var(--line-2);border-radius:var(--r-sm);
+        background:var(--bg-soft);color:var(--ink);width:100%}
+  select{cursor:pointer}
+  input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
   input::placeholder{color:var(--faint)}
-  .row-end{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:16px}
-  .btn{background:var(--accent);color:#fff;border:0;border-radius:11px;padding:11px 22px;font:inherit;font-weight:700;
-       font-size:14px;cursor:pointer;transition:filter .15s,transform .05s;box-shadow:0 4px 14px rgba(97,120,255,.3)}
-  .btn:hover{filter:brightness(1.08)} .btn:active{transform:translateY(1px)}
-  .btn:disabled{opacity:.5;cursor:not-allowed;box-shadow:none}
-  .btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--line-strong);font-weight:600;box-shadow:none}
-  .btn.ghost:hover{background:var(--surface-2);filter:none}
-  .chk{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted)} .chk input{width:auto}
-  .status{font-size:13px;font-family:var(--mono);color:var(--muted)} .status.err{color:var(--bad)}
-  details.adv{margin-top:14px;border-top:1px dashed var(--line);padding-top:14px}
-  details.adv>summary{cursor:pointer;font-size:12.5px;color:var(--muted);font-weight:600;list-style:none}
-  details.adv>summary::before{content:"▸ ";color:var(--accent)} details.adv[open]>summary::before{content:"▾ "}
+  .chk{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;color:var(--muted)} .chk input{width:auto;accent-color:var(--accent)}
+  .hint2{font-size:12px;color:var(--muted);margin:15px 0 0;line-height:1.6} .hint2 code{font-family:var(--mono);background:var(--panel-2);padding:1px 6px;border-radius:4px;color:var(--accent)}
+  .btn{background:var(--accent);color:var(--accent-ink);border:0;border-radius:var(--r-sm);padding:10px 17px;font-family:var(--mono);font-weight:700;
+       font-size:12.5px;letter-spacing:.02em;cursor:pointer;transition:filter .15s,transform .05s;white-space:nowrap}
+  .btn:hover{filter:brightness(1.08)} .btn:active{transform:translateY(1px)} .btn:disabled{opacity:.45;cursor:not-allowed}
+  .btn.sm{padding:7px 13px;font-size:11.5px} .btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--line-2);font-weight:600}
+  .btn.ghost:hover{background:var(--accent-soft);border-color:var(--accent);filter:none}
 
-  /* Tabs */
-  .tabs{position:sticky;top:0;z-index:20;display:flex;gap:5px;margin:22px 0 6px;padding:7px;
-        background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(10px);
-        border:1px solid var(--line);border-radius:13px;overflow-x:auto}
-  .tabs button{flex:0 0 auto;border:0;background:transparent;color:var(--muted);font:inherit;font-weight:600;
-        font-size:13px;padding:8px 15px;border-radius:9px;cursor:pointer;white-space:nowrap;transition:all .15s}
-  .tabs button:hover{color:var(--ink)}
-  .tabs button.on{background:var(--accent);color:#fff;box-shadow:0 3px 10px rgba(97,120,255,.35)}
-  .filters{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:10px 0 2px}
-  .filters .flab{font-size:12px;color:var(--muted);font-weight:700}
-  .filters select{width:auto;min-width:150px;padding:7px 11px;font-size:12.5px;border-radius:9px}
-  .filters select:disabled{opacity:.5}
-  .filters .fcount{font-size:12px;color:var(--accent);font-family:var(--mono);font-weight:600}
+  /* scope segmented */
+  .scope{display:inline-flex;gap:2px;padding:3px;background:var(--bg-soft);border:1px solid var(--line-2);border-radius:var(--r-sm)}
+  .scope button{border:0;background:transparent;color:var(--muted);font-family:var(--mono);font-weight:600;font-size:12px;padding:6px 13px;border-radius:4px;cursor:pointer}
+  .scope button:hover{color:var(--ink)} .scope button.on{background:var(--accent);color:var(--accent-ink)}
 
-  .section-h{display:flex;align-items:baseline;gap:10px;margin:28px 0 13px;scroll-margin-top:70px}
-  .section-h h2{font-size:15px;margin:0;letter-spacing:-.01em} .section-h .sub{font-size:12px;color:var(--muted)}
-
-  /* Scorecards */
-  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}
-  @media(max-width:860px){.cards{grid-template-columns:1fr 1fr}}
-  .sc{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
-      padding:14px 16px 16px;box-shadow:var(--shadow);overflow:hidden;opacity:0;transform:translateY(8px);animation:rise .4s ease forwards}
-  @keyframes rise{to{opacity:1;transform:none}}
-  .sc .k{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
-  .sc .v{font-size:25px;font-weight:800;font-family:var(--mono);letter-spacing:-.02em;margin-top:4px}
-  .sc .d{font-size:11.5px;color:var(--faint);margin-top:2px;font-family:var(--mono)}
+  /* metric cells */
+  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:11px}
+  @media(max-width:760px){.cards{grid-template-columns:1fr 1fr}}
+  .sc{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px 15px 16px;overflow:hidden;transition:border-color .15s}
+  .sc:hover{border-color:var(--line-3)}
+  .sc .k{font-family:var(--mono);font-size:10px;color:var(--faint);font-weight:600;text-transform:uppercase;letter-spacing:.1em}
+  .sc .v{font-family:var(--mono);font-size:25px;font-weight:700;letter-spacing:-.02em;margin-top:6px}
+  .sc .d{font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:3px}
   .v.good{color:var(--good)}.v.ok{color:var(--ok)}.v.warn{color:var(--warn)}.v.bad{color:var(--bad)}
-  .sc .spark{position:absolute;right:0;bottom:0;width:50%;height:34px;opacity:.9}
+  .sc .spark{position:absolute;right:0;bottom:0;width:46%;height:30px;opacity:.8}
 
-  /* Trend */
-  .trend{padding:18px}
-  .trend-insight{font-size:13.5px;padding:11px 14px;border-radius:11px;background:var(--surface-2);
-        border-left:3px solid var(--accent);margin-bottom:14px}
+  /* assessment */
+  .averdict{font-family:var(--mono);font-weight:700;font-size:13.5px;margin-bottom:15px;padding:9px 14px;border-radius:var(--r-sm);
+            display:inline-block;border:1px solid transparent}
+  .averdict.good{background:var(--good-bg);color:var(--good);border-color:var(--good)} .averdict.ok{background:var(--ok-bg);color:var(--ok);border-color:var(--ok)}
+  .averdict.warn{background:var(--warn-bg);color:var(--warn);border-color:var(--warn)} .averdict.bad{background:var(--bad-bg);color:var(--bad);border-color:var(--bad)}
+  .notes-list{list-style:none;margin:0;padding:0}
+  .ni{display:flex;gap:11px;padding:10px 0;font-size:13px;border-top:1px solid var(--line);line-height:1.55}
+  .ni:first-child{border-top:0} .ni .nd{flex:0 0 7px;width:7px;height:7px;border-radius:1px;margin-top:6px;transform:rotate(45deg)}
+  .ni.good .nd{background:var(--good)} .ni.warn .nd{background:var(--warn)} .ni.bad .nd{background:var(--bad)} .ni.info .nd{background:var(--accent)}
+  .amuted{color:var(--muted)}
+
+  /* trend */
+  .trend-insight{font-size:13px;padding:11px 14px;border-radius:var(--r-sm);background:var(--bg-soft);border-left:2px solid var(--accent);margin-bottom:14px}
   .trend-insight .bad{color:var(--bad)} .trend-insight .good{color:var(--good)}
-  .trend-insight .ti-d{display:block;margin-top:4px;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  .trend-insight .ti-d{display:block;margin-top:5px;font-family:var(--mono);font-size:11px;color:var(--faint)}
   .trend-insight .ti-muted{color:var(--muted)}
-  .mchips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
-  .mchip{border:1px solid var(--line-strong);background:transparent;color:var(--muted);font:inherit;font-size:12.5px;
-        font-weight:600;padding:6px 13px;border-radius:999px;cursor:pointer;transition:all .15s}
-  .mchip:hover{color:var(--ink);border-color:var(--accent)}
-  .mchip.on{background:var(--accent);color:#fff;border-color:var(--accent)}
-  .chart-box{position:relative}
-  #chart svg{width:100%;height:auto;display:block}
-  #chart .grid{stroke:var(--grid);stroke-width:1}
-  #chart .yl{fill:var(--faint);font-size:9px;font-family:var(--mono);text-anchor:end}
-  #chart .xl{fill:var(--faint);font-size:9px;font-family:var(--mono)}
-  #chart .empty{color:var(--muted);font-size:13px;padding:30px;text-align:center}
-  .chart-tip{position:absolute;display:none;pointer-events:none;transform:translate(-50%,-135%);
-        background:var(--ink);color:var(--bg);padding:5px 9px;border-radius:7px;font-size:11.5px;
-        font-family:var(--mono);white-space:nowrap;z-index:5;box-shadow:0 4px 12px rgba(0,0,0,.3)}
-  .chart-tip b{font-weight:800;display:block} .chart-tip span{opacity:.7;font-size:10px}
+  .mchips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:15px}
+  .mchip{border:1px solid var(--line-2);background:transparent;color:var(--muted);font-family:var(--mono);font-size:12px;font-weight:600;
+        padding:6px 13px;border-radius:var(--r-sm);cursor:pointer;transition:all .12s}
+  .mchip:hover{color:var(--ink);border-color:var(--line-3)} .mchip.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+  .chart-box{position:relative} #chart svg{width:100%;height:auto;display:block}
+  #chart .grid{stroke:var(--grid);stroke-width:1} #chart .yl{fill:var(--faint);font-size:9px;font-family:var(--mono);text-anchor:end}
+  #chart .xl{fill:var(--faint);font-size:9px;font-family:var(--mono)} #chart .empty{color:var(--muted);font-size:13px;padding:30px;text-align:center;font-family:var(--mono)}
+  .chart-tip{position:absolute;display:none;pointer-events:none;transform:translate(-50%,-135%);background:var(--ink);color:var(--bg);
+        padding:5px 9px;border-radius:var(--r-sm);font-size:11px;font-family:var(--mono);white-space:nowrap;z-index:5}
+  .chart-tip b{font-weight:800;display:block} .chart-tip span{opacity:.65;font-size:10px}
 
-  /* Funnel */
+  /* funnel */
   .funnel{padding:20px}
-  .funnel .verdict{font-size:13.5px;margin-bottom:16px;padding:11px 14px;border-radius:11px;
-        background:var(--surface-2);border-left:3px solid var(--accent)}
-  .stage{display:grid;grid-template-columns:150px 1fr 96px;align-items:center;gap:14px;margin:9px 0}
+  .funnel .verdict{font-size:13px;margin-bottom:17px;padding:11px 14px;border-radius:var(--r-sm);background:var(--bg-soft);border-left:2px solid var(--accent)}
+  .stage{display:grid;grid-template-columns:148px 1fr 84px;align-items:center;gap:14px;margin:8px 0}
   @media(max-width:620px){.stage{grid-template-columns:104px 1fr}.stage .stage-num{display:none}}
-  .stage .lbl{font-size:12.5px;color:var(--muted);font-weight:600}
-  .stage .lbl small{display:block;color:var(--faint);font-weight:400;font-family:var(--mono);font-size:11px}
-  .bar-track{height:30px;background:var(--surface-2);border-radius:8px;overflow:hidden}
-  .bar-fill{height:100%;width:0;border-radius:8px;transition:width .7s cubic-bezier(.2,.7,.2,1);
-        background:linear-gradient(90deg,var(--accent),#A78BFA)}
-  .stage.weak .bar-fill{background:linear-gradient(90deg,#FB7185,var(--bad))}
+  .stage .lbl{font-family:var(--mono);font-size:12px;color:var(--muted);font-weight:600}
+  .stage .lbl small{display:block;color:var(--faint);font-weight:400;font-size:11px;margin-top:1px}
+  .bar-track{height:26px;background:var(--bg-soft);border:1px solid var(--line);border-radius:var(--r-sm);overflow:hidden}
+  .bar-fill{height:100%;width:0;border-radius:3px;transition:width .7s cubic-bezier(.2,.7,.2,1);background:linear-gradient(90deg,var(--accent-2),var(--accent))}
+  .stage.weak .bar-fill{background:linear-gradient(90deg,var(--bad),#D14B66)}
   .stage .stage-num{font-family:var(--mono);font-size:11px;color:var(--faint);text-align:right}
-  .conv{font-size:11px;color:var(--faint);font-family:var(--mono);padding:1px 0 6px 164px}
-  @media(max-width:620px){.conv{padding-left:118px}}
-  .conv.weak{color:var(--bad);font-weight:700}
+  .conv{font-family:var(--mono);font-size:11px;color:var(--faint);padding:1px 0 7px 162px} @media(max-width:620px){.conv{padding-left:118px}}
+  .conv.weak{color:var(--bad);font-weight:600}
 
-  /* Actions */
-  .act{display:flex;gap:13px;padding:15px;border:1px solid var(--line);border-radius:13px;margin-bottom:11px;
-       background:var(--surface);box-shadow:var(--shadow)}
-  .act .sev{flex:0 0 5px;border-radius:4px;align-self:stretch}
+  /* actions */
+  .act{display:flex;gap:13px;padding:15px;border:1px solid var(--line);border-radius:var(--r);margin-bottom:10px;background:var(--panel)}
+  .act .sev{flex:0 0 3px;border-radius:2px;align-self:stretch}
   .act.bad .sev{background:var(--bad)}.act.warn .sev{background:var(--warn)}.act.ok .sev{background:var(--ok)}
-  .act .body{flex:1;min-width:0}
-  .act .who{font-weight:700;font-size:13.5px;margin-bottom:5px}
-  .act .who .sp{color:var(--faint);font-weight:400;font-family:var(--mono);font-size:12px;margin-left:7px}
-  .act p{margin:3px 0;font-size:13px}
-  .act .lab{font-weight:800;font-size:11px;text-transform:uppercase;letter-spacing:.04em;margin-right:5px}
+  .act .who{font-family:var(--mono);font-weight:700;font-size:13px;margin-bottom:6px}
+  .act .who .sp{color:var(--faint);font-weight:400;font-size:11.5px;margin-left:8px}
+  .act p{margin:4px 0;font-size:13px} .act .lab{font-family:var(--mono);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.06em;margin-right:7px}
   .act .lab.p{color:var(--bad)} .act .lab.a{color:var(--accent)} .act .lab.e{color:var(--good)}
 
-  /* Table */
-  .tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);box-shadow:var(--shadow)}
+  /* table */
+  .tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--panel)}
   table{border-collapse:collapse;width:100%;font-size:12.5px;min-width:900px}
-  th,td{padding:10px 12px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
-  th{position:sticky;top:0;background:var(--surface-2);font-size:11px;text-transform:uppercase;letter-spacing:.03em;
-     color:var(--muted);font-weight:700;cursor:pointer;user-select:none;z-index:1}
-  th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--surface);
-     max-width:240px;overflow:hidden;text-overflow:ellipsis}
-  th:first-child{background:var(--surface-2)}
-  tbody tr:hover td{background:var(--surface-2)}
-  td.num{font-family:var(--mono)}
-  .chip{display:inline-block;padding:2px 10px;border-radius:999px;font-size:11px;font-weight:700}
-  .chip.good{background:var(--good-bg);color:var(--good)} .chip.ok{background:var(--ok-bg);color:var(--ok)}
-  .chip.warn{background:var(--warn-bg);color:var(--warn)} .chip.bad{background:var(--bad-bg);color:var(--bad)}
-  .diag{font-size:11.5px;color:var(--muted);text-align:left;white-space:normal;max-width:280px}
-  .hidden{display:none}
-  .note{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.55}
-  .note code{background:var(--surface-2);padding:1px 5px;border-radius:5px;font-size:11.5px}
-  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-top:11px}
-  .spinner{width:15px;height:15px;border:2px solid var(--line-strong);border-top-color:var(--accent);border-radius:50%;
-     display:inline-block;animation:spin .7s linear infinite;vertical-align:-2px;margin-right:7px}
-  @keyframes spin{to{transform:rotate(360deg)}}
+  th,td{padding:9px 12px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+  th{position:sticky;top:0;background:var(--panel-2);font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.06em;
+     color:var(--faint);font-weight:600;cursor:pointer;user-select:none;z-index:1}
+  th:hover{color:var(--accent)}
+  th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--panel);max-width:280px;overflow:hidden;text-overflow:ellipsis}
+  th:first-child{background:var(--panel-2)}
+  tbody tr:nth-child(even) td{background:color-mix(in srgb,var(--panel) 96%,var(--ink) 4%)}
+  tbody tr:hover td{background:var(--accent-soft)} td.num{font-family:var(--mono)}
+  .chip{display:inline-block;padding:2px 9px;border-radius:4px;font-family:var(--mono);font-size:10.5px;font-weight:700;border:1px solid transparent}
+  .chip.good{background:var(--good-bg);color:var(--good);border-color:var(--good)} .chip.ok{background:var(--ok-bg);color:var(--ok);border-color:var(--ok)}
+  .chip.warn{background:var(--warn-bg);color:var(--warn);border-color:var(--warn)} .chip.bad{background:var(--bad-bg);color:var(--bad);border-color:var(--bad)}
+  .diag{font-size:11.5px;color:var(--muted);text-align:left;white-space:normal;max-width:290px}
+  .caret{display:inline-block;width:12px;color:var(--accent);font-size:10px}
+  td .lv{font-family:var(--mono);font-size:9px;font-weight:700;color:var(--faint);border:1px solid var(--line-2);border-radius:3px;padding:0 4px;margin-right:3px}
+  tr.lv1>td{background:color-mix(in srgb,var(--panel) 88%,var(--accent) 12%)!important}
+  tr.lv2>td{background:color-mix(in srgb,var(--panel) 94%,var(--accent) 6%)!important}
+  .legend{display:flex;gap:15px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:12px}
+  .note{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6}
+
   @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  @media(max-width:900px){
+    .body{flex-direction:column} .rail{width:auto;flex:none;height:auto;position:static;border-right:0;border-bottom:1px solid var(--line);
+      display:flex;gap:4px;overflow-x:auto;padding:8px}
+    .rail-h{display:none} .rail button{border-left:0;border-bottom:2px solid transparent;white-space:nowrap;width:auto;margin-bottom:0}
+    .rail button.on{border-left:0;border-bottom-color:var(--accent)}
+    .subbar{position:static} .cmdbar{position:static;top:auto} .topbar{position:static}
+  }
 </style>
 </head>
 <body>
-<div class="wrap">
+<div class="app">
 
-  <div class="appbar">
-    <div class="logo">
-      <div class="mark">JPS</div>
-      <div><b>Ads Console</b><small>Meta Marketing API · diagnostic</small></div>
+  <div class="head">
+  <header class="topbar">
+    <div class="brand"><span class="cur">▌</span>JPS<span class="slash">//</span>ADS<small>meta diagnostic terminal</small></div>
+    <div class="topright">
+      <span class="acctPill" id="acctPill">chưa kết nối</span>
+      <button class="iconbtn" id="theme" title="Sáng / tối">☀</button>
     </div>
-    <div class="bar-right">
-      <span class="acct-pill" id="acctPill">chưa kết nối</span>
-      <button class="iconbtn" id="theme" title="Đổi giao diện sáng/tối">☾</button>
-    </div>
+  </header>
+
+  <div class="cmdbar">
+    <span class="prompt">&#10095;</span>
+    <select id="acct" class="grow"><option value="">— nhập token ở tab Cấu hình —</option></select>
+    <select id="preset">
+      <option value="today">Hôm nay</option><option value="yesterday">Hôm qua</option>
+      <option value="last_7d" selected>7 ngày qua</option><option value="last_14d">14 ngày qua</option>
+      <option value="last_30d">30 ngày qua</option><option value="last_90d">90 ngày qua</option>
+      <option value="this_month">Tháng này</option><option value="last_month">Tháng trước</option>
+      <option value="maximum">Tối đa</option><option value="custom">Tùy chọn…</option>
+    </select>
+    <select id="level">
+      <option value="campaign" selected>Campaign (gộp ad set &amp; ad)</option>
+      <option value="adset">Ad Set</option><option value="ad">Ad</option>
+    </select>
+    <button class="btn" id="run">&#9654; Phân tích</button>
+  </div>
+  <div class="custom" id="customRange" style="display:none">
+    <label class="fld" style="flex:1">Từ ngày<input id="since" type="date" /></label>
+    <label class="fld" style="flex:1">Đến ngày<input id="until" type="date" /></label>
+  </div>
   </div>
 
-  <!-- CONFIG -->
-  <div class="card config">
-    <div class="grid g4">
-      <label class="fld">Access Token
-        <span class="hint">Token có quyền <code>ads_read</code></span>
-        <input id="token" type="password" placeholder="EAAB..." autocomplete="off" />
-      </label>
-      <label class="fld">Tài khoản quảng cáo
-        <span class="hint">Tự tải từ token</span>
-        <select id="acct"><option value="">— nhập token trước —</option></select>
-      </label>
-      <label class="fld">Khoảng thời gian
-        <span class="hint">&nbsp;</span>
-        <select id="preset">
-          <option value="today">Hôm nay</option>
-          <option value="yesterday">Hôm qua</option>
-          <option value="last_7d" selected>7 ngày qua</option>
-          <option value="last_14d">14 ngày qua</option>
-          <option value="last_30d">30 ngày qua</option>
-          <option value="last_90d">90 ngày qua</option>
-          <option value="this_month">Tháng này</option>
-          <option value="last_month">Tháng trước</option>
-          <option value="maximum">Tối đa</option>
-          <option value="custom">Tùy chọn…</option>
-        </select>
-      </label>
-      <label class="fld">Cấp phân tích
-        <span class="hint">&nbsp;</span>
-        <select id="level">
-          <option value="campaign" selected>Campaign</option>
-          <option value="adset">Ad Set</option>
-          <option value="ad">Ad (quảng cáo)</option>
-        </select>
-      </label>
-    </div>
-
-    <div class="grid g4" id="customRange" style="margin-top:14px;display:none">
-      <label class="fld">Từ ngày<input id="since" type="date" /></label>
-      <label class="fld">Đến ngày<input id="until" type="date" /></label>
-    </div>
-
-    <details class="adv">
-      <summary>Cài đặt chấm điểm &amp; mục tiêu</summary>
-      <div class="grid g4" style="margin-top:14px">
-        <label class="fld">ROAS hòa vốn
-          <span class="hint">1 / biên LN gộp. Mặc định 3.33</span>
-          <input id="breakeven" type="number" step="0.01" value="3.33" />
-        </label>
-        <label class="fld">CPO mục tiêu
-          <span class="hint">Để trống = không chấm CPO</span>
-          <input id="targetCPO" type="number" step="1" placeholder="vd 80000" />
-        </label>
-        <label class="fld">Stop-loss (chi tiêu, 0 đơn)
-          <span class="hint">Chi quá ngưỡng mà 0 đơn → DỪNG</span>
-          <input id="stoploss" type="number" step="1" placeholder="vd 300000" />
-        </label>
-        <label class="fld">Mục tiêu chính
-          <span class="hint">Auto = theo objective campaign</span>
-          <select id="goal">
-            <option value="auto" selected>Auto</option>
-            <option value="sales">Doanh số / Conversion</option>
-            <option value="leads">Lead</option>
-            <option value="traffic">Traffic</option>
-            <option value="awareness">Nhận diện</option>
-          </select>
-        </label>
-      </div>
-      <div class="grid g3" style="margin-top:14px">
-        <label class="fld">Graph API version<input id="ver" value="v23.0" /></label>
-        <label class="chk" style="align-self:end;padding-bottom:10px">
-          <input id="remember" type="checkbox" /> Nhớ token trong trình duyệt này
-        </label>
-      </div>
-    </details>
-
-    <div class="row-end">
-      <button class="btn" id="run">Tải dữ liệu &amp; phân tích</button>
-      <span class="status" id="status">Nhập token → chọn tài khoản → phân tích.</span>
-    </div>
-  </div>
-
-  <!-- RESULTS -->
-  <div id="results" class="hidden">
-    <nav class="tabs" id="tabs">
-      <button data-t="secOverview" class="on">Tổng quan</button>
-      <button data-t="secTrend">Xu hướng</button>
-      <button data-t="secFunnel">Phễu</button>
-      <button data-t="secActions">Đề xuất</button>
-      <button data-t="secGroup">Theo nhóm</button>
-      <button data-t="secDetail">Chi tiết</button>
+  <div class="body">
+    <nav class="rail" id="nav">
+      <div class="rail-h">Sections</div>
+      <button data-p="cfg" class="on"><i>›</i>Cấu hình</button>
+      <button data-p="overview" class="off"><i>›</i>Tổng quan</button>
+      <button data-p="assess" class="off"><i>›</i>Đánh giá</button>
+      <button data-p="trend" class="off"><i>›</i>Xu hướng</button>
+      <button data-p="funnel" class="off"><i>›</i>Phễu</button>
+      <button data-p="actions" class="off"><i>›</i>Đề xuất</button>
+      <button data-p="group" class="off"><i>›</i>Theo nhóm</button>
+      <button data-p="detail" class="off"><i>›</i>Chi tiết</button>
     </nav>
 
-    <div class="filters" id="filters" style="display:none">
-      <span class="flab">Lọc</span>
-      <select id="fStaff"><option value="">Nhân sự: tất cả</option></select>
-      <select id="fPage"><option value="">Page: tất cả</option></select>
-      <select id="fShop"><option value="">Cửa hàng: tất cả</option></select>
-      <button class="btn ghost" id="fClear" style="padding:6px 13px;font-size:12px">Xóa lọc</button>
-      <span class="fcount" id="fCount"></span>
-    </div>
+    <main class="stage">
+      <div class="subbar" id="subbar" style="display:none">
+        <div class="scope" id="scope">
+          <button data-c="" class="on">Tất cả</button><button data-c="online">Online</button><button data-c="o2o">Cửa hàng</button>
+        </div>
+        <span class="flab">Lọc</span>
+        <select id="fStaff"><option value="">Nhân sự: tất cả</option></select>
+        <select id="fPage"><option value="">Page: tất cả</option></select>
+        <select id="fShop"><option value="">Cửa hàng: tất cả</option></select>
+        <button class="btn ghost sm" id="fClear">Xóa lọc</button>
+        <span class="fcount" id="fCount"></span>
+      </div>
 
-    <div class="section-h" id="secOverview"><h2 id="sumH">Tổng quan tài khoản</h2><span class="sub" id="sumRange"></span></div>
-    <div class="cards" id="cards"></div>
+      <div class="content">
+        <!-- CFG -->
+        <section class="panel show" data-panel="cfg">
+          <div class="card pad" style="max-width:780px">
+            <h3 class="ph">Kết nối &amp; cấu hình</h3>
+            <div class="grid g2">
+              <label class="fld">Access Token <span class="hint">quyền <code>ads_read</code></span>
+                <input id="token" type="password" placeholder="EAAB..." autocomplete="off" /></label>
+              <label class="fld">Graph API version<input id="ver" value="v23.0" /></label>
+            </div>
+            <h3 class="ph" style="margin-top:22px">Chấm điểm &amp; mục tiêu</h3>
+            <div class="grid g4">
+              <label class="fld">ROAS hòa vốn<span class="hint">1 / biên LN gộp</span><input id="breakeven" type="number" step="0.01" value="3.33" /></label>
+              <label class="fld">CPO mục tiêu<span class="hint">trống = bỏ qua</span><input id="targetCPO" type="number" step="1" placeholder="vd 80000" /></label>
+              <label class="fld">Stop-loss<span class="hint">chi, 0 đơn</span><input id="stoploss" type="number" step="1" placeholder="vd 300000" /></label>
+              <label class="fld">Mục tiêu chính<span class="hint">auto theo objective</span>
+                <select id="goal"><option value="auto" selected>Auto</option><option value="sales">Doanh số</option>
+                <option value="leads">Lead</option><option value="traffic">Traffic</option><option value="awareness">Nhận diện</option></select></label>
+            </div>
+            <label class="chk" style="margin-top:16px"><input id="remember" type="checkbox" /> Nhớ token trong trình duyệt này</label>
+            <p class="hint2">Chạy cục bộ trên máy anh; token chỉ gửi tới Meta. Sau khi nhập token, danh sách tài khoản tải vào ô chọn trên thanh lệnh. Công cụ chỉ <b>đọc</b> dữ liệu — không chỉnh campaign.</p>
+          </div>
+        </section>
 
-    <div class="section-h" id="secTrend"><h2>Xu hướng theo ngày</h2><span class="sub">Phát hiện đà tăng/giảm &amp; fatigue</span></div>
-    <div class="card trend" id="trendCard">
-      <div class="trend-insight" id="trendInsight"></div>
-      <div class="mchips" id="trendChips"></div>
-      <div class="chart-box"><div id="chart"></div><div class="chart-tip" id="chartTip"></div></div>
-    </div>
+        <!-- OVERVIEW -->
+        <section class="panel" data-panel="overview">
+          <div class="phead"><h3 id="sumH">Tổng quan tài khoản</h3><span class="psub" id="sumRange"></span></div>
+          <div class="cards" id="cards"></div>
+        </section>
 
-    <div class="section-h" id="secFunnel"><h2>Chẩn đoán phễu</h2><span class="sub">Mắt xích nào đang gãy</span></div>
-    <div class="card funnel" id="funnel"></div>
+        <!-- ASSESS -->
+        <section class="panel" data-panel="assess">
+          <div class="phead"><h3>Đánh giá &amp; lưu ý</h3><span class="psub" id="assessScope"></span></div>
+          <div class="card pad"><div id="assess"></div></div>
+        </section>
 
-    <div class="section-h" id="secActions"><h2>Đề xuất hành động</h2><span class="sub">Ưu tiên theo tác động</span></div>
-    <div id="actions"></div>
+        <!-- TREND -->
+        <section class="panel" data-panel="trend">
+          <div class="phead"><h3>Xu hướng theo ngày</h3><span class="psub">Đà tăng/giảm &amp; fatigue</span></div>
+          <div class="card pad">
+            <div class="trend-insight" id="trendInsight"></div>
+            <div class="mchips" id="trendChips"></div>
+            <div class="chart-box"><div id="chart"></div><div class="chart-tip" id="chartTip"></div></div>
+          </div>
+        </section>
 
-    <div class="section-h" id="secGroup"><h2>Phân tích theo nhóm</h2><span class="sub" id="groupCov"></span></div>
-    <div class="card" id="groupCard" style="padding:18px">
-      <div class="mchips" id="groupDims"></div>
-      <div class="tbl-wrap" style="box-shadow:none"><table id="gtbl"></table></div>
-    </div>
+        <!-- FUNNEL -->
+        <section class="panel" data-panel="funnel">
+          <div class="phead"><h3>Chẩn đoán phễu</h3><span class="psub">Mắt xích nào đang gãy</span></div>
+          <div class="card funnel" id="funnel"></div>
+        </section>
 
-    <div class="section-h" id="secDetail">
-      <h2 id="tblH">Chấm điểm chi tiết</h2><span class="sub" id="tblLevel"></span>
-      <button class="btn ghost" id="csv" style="margin-left:auto;padding:7px 15px;font-size:12.5px">Xuất CSV</button>
-    </div>
-    <div class="tbl-wrap"><table id="tbl"></table></div>
-    <div class="legend">
-      <span><span class="chip good">Tốt</span> ≥80</span>
-      <span><span class="chip ok">Khá</span> ≥60</span>
-      <span><span class="chip warn">Cần cải thiện</span> ≥40</span>
-      <span><span class="chip bad">Kém</span> &lt;40</span>
-      <span>Trọng số: ROAS×3 · CPO×3 · CPM×1 (so nội bộ)</span>
-    </div>
-    <p class="note">Công cụ chỉ <b>đọc</b> dữ liệu, không bật/tắt hay chỉnh campaign — mọi thay đổi anh tự làm trong Ads Manager.
-      Ad set còn <i>học máy</i> (&lt;~50 đơn/tuần) được nới điểm vì dữ liệu chưa đủ tin.</p>
+        <!-- ACTIONS -->
+        <section class="panel" data-panel="actions">
+          <div class="phead"><h3>Đề xuất hành động</h3><span class="psub">Ưu tiên theo tác động</span></div>
+          <div id="actions"></div>
+        </section>
+
+        <!-- GROUP -->
+        <section class="panel" data-panel="group">
+          <div class="phead"><h3>Phân tích theo nhóm</h3><span class="psub" id="groupCov"></span></div>
+          <div class="card pad"><div class="mchips" id="groupDims"></div>
+            <div class="tbl-wrap" style="border:1px solid var(--line)"><table id="gtbl"></table></div></div>
+        </section>
+
+        <!-- DETAIL -->
+        <section class="panel" data-panel="detail">
+          <div class="phead"><h3 id="tblH">Chấm điểm chi tiết</h3><span class="psub" id="tblLevel"></span>
+            <button class="btn ghost sm" id="csv">⤓ Xuất CSV</button></div>
+          <div class="tbl-wrap"><table id="tbl"></table></div>
+          <div class="legend">
+            <span><span class="chip good">Tốt</span> ≥80</span><span><span class="chip ok">Khá</span> ≥60</span>
+            <span><span class="chip warn">Cần cải thiện</span> ≥40</span><span><span class="chip bad">Kém</span> &lt;40</span>
+            <span>Trọng số ROAS×3 · CPO×3 · CPM×1</span>
+          </div>
+          <p class="note">Ad set còn <i>học máy</i> (&lt;~50 đơn/tuần) được nới điểm vì dữ liệu chưa đủ tin. Ở cấp Campaign, tick vào dòng để xổ Ad set → Ad.</p>
+        </section>
+      </div>
+    </main>
   </div>
-</div>
 
+  <footer class="statusbar"><span class="led"></span><span class="status" id="status">Nhập token ở tab Cấu hình để bắt đầu.</span></footer>
+</div>
 <script>
 "use strict";
 const $=id=>document.getElementById(id);
-let CUR='VND', ROWS=[], ACCOUNTS=[], SERIES=null, curMetric='roas', SINGLE=null, FILTERS={staff:'',page:'',cuahang:''};
+let CUR='VND', ROWS=[], ACCOUNTS=[], SERIES=null, curMetric='roas', SINGLE=null,
+    FILTERS={staff:'',page:'',cuahang:'',channel:''}, MODE='single', DATA_LOADED=false, CURPANEL='cfg';
 
 const F={
   money:(n,c)=>(n==null||isNaN(n))?'—':new Intl.NumberFormat('vi-VN',{style:'currency',currency:c||'VND',maximumFractionDigits:c==='VND'?0:2}).format(n),
   num:(n,d=0)=>(n==null||isNaN(n))?'—':new Intl.NumberFormat('vi-VN',{maximumFractionDigits:d}).format(n),
-  pct:(n,d=2)=>(n==null||isNaN(n))?'—':F.num(n,d)+'%',
-  x:(n,d=2)=>(n==null||isNaN(n))?'—':F.num(n,d)+'×'
+  pct:(n,d=2)=>(n==null||isNaN(n))?'—':F.num(n,d)+'%', x:(n,d=2)=>(n==null||isNaN(n))?'—':F.num(n,d)+'×'
 };
 const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const r2=n=>n==null||isNaN(n)?'':Math.round(n*100)/100;
 const q=s=>'"'+String(s).replace(/"/g,'""')+'"';
 const shortDate=s=>{if(!s)return'';const p=s.split('-');return p[2]+'/'+p[1];};
 
-/* ---------- preset → days ---------- */
 const PRESET_DAYS={today:1,yesterday:1,last_7d:7,last_14d:14,last_30d:30,last_90d:90,this_month:new Date().getDate(),last_month:30,maximum:90};
 function rangeDays(){const p=$('preset').value;
-  if(p==='custom'){const a=new Date($('since').value),b=new Date($('until').value);const d=Math.round((b-a)/864e5)+1;return d>0?d:30;}
-  return PRESET_DAYS[p]||30;}
+  if(p==='custom'){const a=new Date($('since').value),b=new Date($('until').value);const d=Math.round((b-a)/864e5)+1;return d>0?d:30;}return PRESET_DAYS[p]||30;}
 function presetLabel(){const o=$('preset');return o.options[o.selectedIndex].text;}
 function setStatus(t,err){const s=$('status');s.textContent=t;s.className='status'+(err?' err':'');}
 
-/* ---------- Meta helpers ---------- */
+/* Meta */
 const PURCH=['omni_purchase','purchase','offsite_conversion.fb_pixel_purchase','onsite_web_purchase'];
 const LEADS=['lead','offsite_conversion.fb_pixel_lead','onsite_conversion.lead_grouped','leadgen_grouped'];
 function av(arr,types){if(!Array.isArray(arr))return 0;for(const t of types){const f=arr.find(a=>a.action_type===t);if(f&&f.value!=null)return parseFloat(f.value)||0;}return 0;}
 const belowAvg=r=>typeof r==='string'&&r.startsWith('below');
-
 function metrics(r){
   const spend=+r.spend||0,impr=+r.impressions||0,reach=+r.reach||0,freq=+r.frequency||0;
-  const linkClicks=+(r.inline_link_clicks||r.clicks)||0;
-  const ctr=+(r.inline_link_click_ctr||r.ctr)||0, cpc=+r.cpc||0, cpm=+r.cpm||0;
-  const purch=av(r.actions,PURCH), revenue=av(r.action_values,PURCH);
-  let roas=av(r.purchase_roas,PURCH); if(!roas&&spend>0&&revenue>0)roas=revenue/spend;
-  const leads=av(r.actions,LEADS), lpViews=av(r.actions,['landing_page_view']);
-  const cpo=purch>0?spend/purch:null, cpl=leads>0?spend/leads:null;
-  const cvr=linkClicks>0?purch/linkClicks*100:0, lpRate=linkClicks>0?lpViews/linkClicks*100:0;
+  const linkClicks=+(r.inline_link_clicks||r.clicks)||0,ctr=+(r.inline_link_click_ctr||r.ctr)||0,cpc=+r.cpc||0,cpm=+r.cpm||0;
+  const purch=av(r.actions,PURCH),revenue=av(r.action_values,PURCH); let roas=av(r.purchase_roas,PURCH); if(!roas&&spend>0&&revenue>0)roas=revenue/spend;
+  const leads=av(r.actions,LEADS),lpViews=av(r.actions,['landing_page_view']);
+  const cpo=purch>0?spend/purch:null,cpl=leads>0?spend/leads:null,cvr=linkClicks>0?purch/linkClicks*100:0,lpRate=linkClicks>0?lpViews/linkClicks*100:0;
   return {name:r.campaign_name||r.adset_name||r.ad_name||'—',objective:(r.objective||'').toUpperCase(),
     spend,impr,reach,freq,linkClicks,ctr,cpc,cpm,purch,revenue,roas,leads,lpViews,cpo,cpl,cvr,lpRate,
     qr:r.quality_ranking,er:r.engagement_rate_ranking,cr:r.conversion_rate_ranking};
 }
 function goalOf(m){const g=$('goal').value;if(g!=='auto')return g;const o=m.objective;
-  if(/SALES|CONVERSION|PURCHASE|CATALOG|PRODUCT/.test(o))return'sales';
-  if(/LEAD/.test(o))return'leads'; if(/TRAFFIC|LINK_CLICK/.test(o))return'traffic';
-  if(/AWARENESS|REACH|BRAND|VIDEO_VIEW|THRUPLAY/.test(o))return'awareness';
+  if(/SALES|CONVERSION|PURCHASE|CATALOG|PRODUCT/.test(o))return'sales'; if(/LEAD/.test(o))return'leads';
+  if(/TRAFFIC|LINK_CLICK/.test(o))return'traffic'; if(/AWARENESS|REACH|BRAND|VIDEO_VIEW|THRUPLAY/.test(o))return'awareness';
   if(/ENGAGEMENT|POST|PAGE_LIKE|MESSAGE/.test(o))return'engagement'; return'sales';}
-
-const GRADES=[{min:80,label:'Tốt',cls:'good',rank:4},{min:60,label:'Khá',cls:'ok',rank:3},
-              {min:40,label:'Cần cải thiện',cls:'warn',rank:2},{min:0,label:'Kém',cls:'bad',rank:1}];
+const GRADES=[{min:80,label:'Tốt',cls:'good',rank:4},{min:60,label:'Khá',cls:'ok',rank:3},{min:40,label:'Cần cải thiện',cls:'warn',rank:2},{min:0,label:'Kém',cls:'bad',rank:1}];
 const gradeOf=s=>GRADES.find(g=>s>=g.min);
 const band=(v,a,b,c)=>v>=a?4:v>=b?3:v>=c?2:1;
 const bandRel=(v,med)=>med>0?(v<=0.8*med?4:v<=1.1*med?3:v<=1.4*med?2:1):3;
-
 function score(m,ctx){
-  const be=ctx.breakeven,days=ctx.days,goal=goalOf(m),tCPO=ctx.targetCPO,stop=ctx.stoploss;
-  let parts=[],notes=[];
+  const be=ctx.breakeven,days=ctx.days,goal=goalOf(m),tCPO=ctx.targetCPO,stop=ctx.stoploss; let parts=[],notes=[];
   if(goal==='sales'){parts.push([m.roas?band(m.roas,1.3*be,be,0.7*be):1,3]);
-    if(tCPO)parts.push([m.cpo!=null?band(-(m.cpo),-(0.8*tCPO),-(tCPO),-(1.3*tCPO)):1,3]);
-    parts.push([bandRel(m.cpm,ctx.medCPM),1]);
-  }else if(goal==='leads'){
-    if(tCPO)parts.push([m.cpl!=null?band(-(m.cpl),-(0.8*tCPO),-(tCPO),-(1.3*tCPO)):1,3]);
-    else parts.push([bandRel(m.cpl||1e12,ctx.medCPL),3]);
-    parts.push([band(m.ctr,1.5,0.8,0.5),1]);
+    if(tCPO)parts.push([m.cpo!=null?band(-(m.cpo),-(0.8*tCPO),-(tCPO),-(1.3*tCPO)):1,3]); parts.push([bandRel(m.cpm,ctx.medCPM),1]);
+  }else if(goal==='leads'){if(tCPO)parts.push([m.cpl!=null?band(-(m.cpl),-(0.8*tCPO),-(tCPO),-(1.3*tCPO)):1,3]);else parts.push([bandRel(m.cpl||1e12,ctx.medCPL),3]); parts.push([band(m.ctr,1.5,0.8,0.5),1]);
   }else if(goal==='traffic'){parts.push([band(m.ctr,1.5,0.8,0.5),3]);parts.push([bandRel(m.cpc,ctx.medCPC),2]);
   }else if(goal==='awareness'){parts.push([bandRel(m.cpm,ctx.medCPM),3]);parts.push([band(-(m.freq),-3,-4,-5),2]);
   }else parts.push([bandRel(m.cpm,ctx.medCPM),1]);
-  const wsum=parts.reduce((s,[v,w])=>s+v*w,0),wmax=parts.reduce((s,[,w])=>s+4*w,0);
-  let pct=Math.round(wsum/wmax*100),g=gradeOf(pct);
-  const weekly=(goal==='leads'?m.leads:m.purch)/(days/7);
-  const learning=(goal==='sales'||goal==='leads')&&weekly<50;
-  const stopSpend=stop||(tCPO?tCPO*3:Infinity);
-  const stopLoss=goal==='sales'&&m.purch===0&&m.spend>=stopSpend;
+  const wsum=parts.reduce((s,[v,w])=>s+v*w,0),wmax=parts.reduce((s,[,w])=>s+4*w,0); let pct=Math.round(wsum/wmax*100),g=gradeOf(pct);
+  const weekly=(goal==='leads'?m.leads:m.purch)/(days/7); const learning=(goal==='sales'||goal==='leads')&&weekly<50;
+  const stopSpend=stop||(tCPO?tCPO*3:Infinity); const stopLoss=goal==='sales'&&m.purch===0&&m.spend>=stopSpend;
   if(stopLoss){g=GRADES[3];notes.push('DỪNG (stop-loss): chi '+F.money(m.spend,CUR)+' chưa ra đơn');}
   else if(learning&&g.rank===1){pct=Math.max(pct,40);g=GRADES.find(x=>x.label==='Cần cải thiện');notes.push('đang học máy, dữ liệu chưa đủ tin');}
   else if(learning){notes.push('học máy ('+F.num(weekly,0)+' đơn/tuần quy đổi)');}
   return {goal,pct,grade:g,learning,stopLoss,notes};
 }
-
 function diagnose(m,ctx){
-  const ctrLow=m.ctr>0&&m.ctr<0.8,cvrLow=m.cvr<1&&m.linkClicks>=30,freqHigh=m.freq>3.5;
-  const cpmHigh=ctx.medCPM>0&&m.cpm>1.4*ctx.medCPM;
-  if(m.linkClicks<30&&m.purch<10)return{link:'Dữ liệu',severity:1,
-    text:'Mẫu nhỏ ('+F.num(m.linkClicks)+' click) — chưa đủ để kết luận.',
-    action:'Gom ngân sách / nới tệp để đủ tín hiệu, chờ thêm dữ liệu.',expect:'Đủ ~50 chuyển đổi/tuần để số liệu đáng tin.'};
-  if(freqHigh)return{link:'Tần suất',severity:2,
-    text:'Frequency '+F.num(m.freq,1)+' (>3.5) → audience fatigue.',
-    action:'Làm mới creative, mở rộng/đổi tệp (lookalike mới), loại trừ người đã mua.',expect:'CTR phục hồi, CPM/CPO hạ.'};
-  if(cpmHigh||belowAvg(m.qr))return{link:'Hiển thị (CPM)',severity:2,
-    text:'CPM '+F.money(m.cpm,CUR)+(cpmHigh?' cao hơn ~40% trung vị tài khoản':' kèm Quality ranking thấp')+' → đấu giá đắt / relevance thấp.',
-    action:'Nới targeting hoặc Advantage+ audience; cải thiện chất lượng creative.',expect:'CPM giảm.'};
-  if(ctrLow||belowAvg(m.er))return{link:'Click (CTR)',severity:2,
-    text:'CTR '+F.pct(m.ctr)+' (<0.8%)'+(m.cpm&&ctx.medCPM&&m.cpm<=1.1*ctx.medCPM?' trong khi CPM bình thường':'')+' → creative chưa hút hoặc sai tệp.',
-    action:'Test hook 3 giây đầu video, đổi hình/headline, thử 2–3 góc tiếp cận; kiểm tra tệp.',expect:'CTR lên 1%+, CPC giảm.'};
-  if(cvrLow||belowAvg(m.cr))return{link:'Sau click (CVR)',severity:3,
-    text:'CTR ổn nhưng CVR '+F.pct(m.cvr)+' (<1%)'+(m.lpRate&&m.lpRate<70?'; landing/click '+F.pct(m.lpRate,0)+' → trang chậm':'')+' → vấn đề landing/offer/trust.',
-    action:'Tối ưu tốc độ trang, đồng bộ ad–landing, rút gọn form, thêm review/bảo hành, test ưu đãi.',expect:'CVR vượt 1–3%, CPO giảm.'};
-  if(m.roas&&m.roas<ctx.breakeven&&m.cvr>=1)return{link:'Giá trị đơn',severity:2,
-    text:'Có đơn nhưng ROAS '+F.x(m.roas)+' < hòa vốn '+F.x(ctx.breakeven)+' → giá trị đơn thấp / sai tệp.',
-    action:'Đẩy upsell–bundle tăng AOV, nhắm tệp giá trị cao hơn, xem lại attribution.',expect:'ROAS vượt hòa vốn.'};
-  return{link:'Khỏe',severity:0,text:'Các mắt xích phễu trong ngưỡng tốt.',
-    action:'Giữ cấu trúc, cân nhắc scale ngân sách 20–30%/lần.',expect:'Duy trì hiệu quả khi tăng quy mô.'};
+  const ctrLow=m.ctr>0&&m.ctr<0.8,cvrLow=m.cvr<1&&m.linkClicks>=30,freqHigh=m.freq>3.5,cpmHigh=ctx.medCPM>0&&m.cpm>1.4*ctx.medCPM;
+  if(m.linkClicks<30&&m.purch<10)return{link:'Dữ liệu',severity:1,text:'Mẫu nhỏ ('+F.num(m.linkClicks)+' click) — chưa đủ để kết luận.',action:'Gom ngân sách / nới tệp để đủ tín hiệu.',expect:'Đủ ~50 chuyển đổi/tuần.'};
+  if(freqHigh)return{link:'Tần suất',severity:2,text:'Frequency '+F.num(m.freq,1)+' (>3.5) → audience fatigue.',action:'Làm mới creative, mở rộng/đổi tệp, loại trừ người đã mua.',expect:'CTR phục hồi, CPM/CPO hạ.'};
+  if(cpmHigh||belowAvg(m.qr))return{link:'Hiển thị (CPM)',severity:2,text:'CPM '+F.money(m.cpm,CUR)+(cpmHigh?' cao hơn ~40% trung vị':' kèm Quality ranking thấp')+' → đấu giá đắt / relevance thấp.',action:'Nới targeting hoặc Advantage+; cải thiện creative.',expect:'CPM giảm.'};
+  if(ctrLow||belowAvg(m.er))return{link:'Click (CTR)',severity:2,text:'CTR '+F.pct(m.ctr)+' (<0.8%)'+(m.cpm&&ctx.medCPM&&m.cpm<=1.1*ctx.medCPM?' trong khi CPM bình thường':'')+' → creative chưa hút hoặc sai tệp.',action:'Test hook 3 giây đầu, đổi hình/headline, thử góc mới.',expect:'CTR lên 1%+.'};
+  if(cvrLow||belowAvg(m.cr))return{link:'Sau click (CVR)',severity:3,text:'CTR ổn nhưng CVR '+F.pct(m.cvr)+' (<1%)'+(m.lpRate&&m.lpRate<70?'; landing/click '+F.pct(m.lpRate,0)+' → trang chậm':'')+' → vấn đề landing/offer/trust.',action:'Tối ưu tốc độ trang, đồng bộ ad–landing, rút gọn form, thêm review.',expect:'CVR vượt 1–3%.'};
+  if(m.roas&&m.roas<ctx.breakeven&&m.cvr>=1)return{link:'Giá trị đơn',severity:2,text:'Có đơn nhưng ROAS '+F.x(m.roas)+' < hòa vốn '+F.x(ctx.breakeven)+' → giá trị đơn thấp.',action:'Upsell–bundle tăng AOV, nhắm tệp giá trị cao hơn.',expect:'ROAS vượt hòa vốn.'};
+  return{link:'Khỏe',severity:0,text:'Các mắt xích phễu trong ngưỡng tốt.',action:'Giữ cấu trúc, scale 20–30%/lần.',expect:'Duy trì hiệu quả.'};
 }
 
-/* ---------- API ---------- */
-function fieldsFor(level){
-  const b=['spend','impressions','reach','frequency','clicks','inline_link_clicks','ctr','inline_link_click_ctr',
-    'cpc','cpm','actions','action_values','cost_per_action_type','purchase_roas','objective'];
-  if(level==='campaign')b.push('campaign_name');
-  if(level==='adset')b.push('campaign_name','adset_name');
-  if(level==='ad')b.push('campaign_name','adset_name','ad_name','quality_ranking','engagement_rate_ranking','conversion_rate_ranking');
-  return b.join(',');
-}
-function timeParam(){const p=$('preset').value;
-  if(p==='custom')return"&time_range="+encodeURIComponent(JSON.stringify({since:$('since').value,until:$('until').value}));
-  return"&date_preset="+p;}
-async function gget(url){const r=await fetch(url);const j=await r.json();
-  if(j.error){const e=j.error;throw new Error(e.error_user_msg||e.message||'Lỗi API');}return j;}
-async function fetchAll(base){let url=base+"&limit=200",out=[],g=0;
-  while(url&&g++<25){const j=await gget(url);out=out.concat(j.data||[]);url=j.paging&&j.paging.next?j.paging.next:null;}return out;}
-
-/* ---------- daily series ---------- */
-async function fetchDaily(G,actId,token){
-  const f=['spend','impressions','inline_link_clicks','clicks','inline_link_click_ctr','ctr','cpm','frequency','actions','action_values','purchase_roas'].join(',');
-  const rows=await fetchAll(G+actId+'/insights?level=account&time_increment=1&fields='+f+timeParam()+'&access_token='+encodeURIComponent(token));
-  rows.sort((a,b)=>(a.date_start||'').localeCompare(b.date_start||''));
-  const s={dates:[],spend:[],roas:[],purch:[],ctr:[],cpm:[],cpo:[],freq:[]};
-  rows.forEach(r=>{const m=metrics(r);s.dates.push(r.date_start);s.spend.push(m.spend);s.roas.push(m.roas||null);
-    s.purch.push(m.purch);s.ctr.push(m.ctr||null);s.cpm.push(m.cpm||null);s.cpo.push(m.cpo);s.freq.push(m.freq||null);});
-  return s;
-}
-const METRICS={
-  spend:{label:'Chi tiêu',fmt:v=>F.money(v,CUR),color:'var(--accent)'},
-  roas:{label:'ROAS',fmt:v=>F.x(v),color:'var(--good)'},
-  purch:{label:'Đơn',fmt:v=>F.num(v),color:'var(--accent)'},
-  ctr:{label:'CTR',fmt:v=>F.pct(v),color:'var(--ok)'},
-  cpm:{label:'CPM',fmt:v=>F.money(v,CUR),color:'var(--warn)'},
-  cpo:{label:'CPO',fmt:v=>v!=null?F.money(v,CUR):'—',color:'var(--bad)'}
-};
-function trendInsight(s){
-  if(s.dates.length<6)return'<span class="ti-muted">Cần ≥6 ngày dữ liệu để phân tích xu hướng.</span>';
-  const half=Math.floor(s.dates.length/2);
-  const mean=(arr,a,b)=>{const x=arr.slice(a,b).filter(v=>v!=null&&!isNaN(v));return x.length?x.reduce((p,c)=>p+c,0)/x.length:null;};
-  const r1=mean(s.roas,0,half),r2=mean(s.roas,half),c1=mean(s.ctr,0,half),c2=mean(s.ctr,half),f1=mean(s.freq,0,half),f2=mean(s.freq,half);
-  const dR=r1?(r2-r1)/r1*100:0,dC=c1?(c2-c1)/c1*100:0,dF=f1?(f2-f1)/f1*100:0;
-  const ar=v=>v>=0?'▲':'▼';
-  let v;
-  if(dR<-10&&(dC<-5||dF>10))v='<b class="bad">Dấu hiệu fatigue:</b> ROAS nửa cuối giảm '+Math.abs(dR).toFixed(0)+'%'+(dC<-5?', CTR giảm '+Math.abs(dC).toFixed(0)+'%':'')+(dF>10?', tần suất tăng '+dF.toFixed(0)+'%':'')+' → cân nhắc làm mới creative / đổi tệp.';
-  else if(dR>10)v='<b class="good">Đang lên:</b> ROAS nửa cuối tăng '+dR.toFixed(0)+'% → cân nhắc scale ngân sách từ từ.';
-  else v='<b>Ổn định:</b> ROAS dao động '+(dR>=0?'+':'')+dR.toFixed(0)+'% giữa hai nửa kỳ.';
-  return v+'<span class="ti-d">ROAS '+ar(dR)+Math.abs(dR).toFixed(0)+'% · CTR '+ar(dC)+Math.abs(dC).toFixed(0)+'% · Freq '+ar(dF)+Math.abs(dF).toFixed(0)+'%</span>';
-}
-function renderTrend(series){
-  SERIES=series;
-  $('trendInsight').innerHTML=trendInsight(series);
-  $('trendChips').innerHTML=Object.keys(METRICS).map(k=>'<button class="mchip'+(k===curMetric?' on':'')+'" data-m="'+k+'">'+METRICS[k].label+'</button>').join('');
-  $('trendChips').querySelectorAll('.mchip').forEach(b=>b.onclick=()=>{curMetric=b.dataset.m;renderTrend(series);});
-  drawChart(series,curMetric);
-}
-function drawChart(series,key){
-  const m=METRICS[key],dates=series.dates,raw=series[key],n=dates.length;
-  const idx=[];raw.forEach((v,i)=>{if(v!=null&&!isNaN(v))idx.push(i);});
-  if(idx.length<2){$('chart').innerHTML='<div class="empty">Chưa đủ dữ liệu theo ngày.</div>';return;}
-  const W=720,H=250,pl=8,pr=14,pt=14,pb=24;
-  const vals=idx.map(i=>raw[i]); let mn=Math.min(...vals),mx=Math.max(...vals);
-  if(mn===mx){mn=mn*0.9;mx=mx*1.1||1;} const pad=(mx-mn)*0.12;mn-=pad;if(key!=='roas'&&mn<0)mn=0;mx+=pad;
-  const X=i=>pl+i*(W-pl-pr)/(n-1),Y=v=>pt+(1-(v-mn)/(mx-mn))*(H-pt-pb);
-  let grid='',lab='';
-  for(let g=0;g<=3;g++){const v=mn+(mx-mn)*g/3,y=Y(v);
-    grid+='<line class="grid" x1="'+pl+'" y1="'+y.toFixed(1)+'" x2="'+(W-pr)+'" y2="'+y.toFixed(1)+'"/>';
-    lab+='<text class="yl" x="'+(W-pr)+'" y="'+(y-3).toFixed(1)+'">'+m.fmt(v)+'</text>';}
-  let d='',st=false; raw.forEach((v,i)=>{if(v==null||isNaN(v)){st=false;return;}d+=(st?' L':' M')+X(i).toFixed(1)+','+Y(v).toFixed(1);st=true;});
-  const f=idx[0],l=idx[idx.length-1]; let area='M'+X(f).toFixed(1)+','+(H-pb);
-  raw.forEach((v,i)=>{if(v==null||isNaN(v))return;area+=' L'+X(i).toFixed(1)+','+Y(v).toFixed(1);}); area+=' L'+X(l).toFixed(1)+','+(H-pb)+' Z';
-  const xi=[0,Math.floor((n-1)/2),n-1];
-  const xl=xi.map(i=>'<text class="xl" x="'+X(i).toFixed(1)+'" y="'+(H-7)+'" text-anchor="'+(i===0?'start':i===n-1?'end':'middle')+'">'+shortDate(dates[i])+'</text>').join('');
-  const dots=idx.map(i=>'<circle cx="'+X(i).toFixed(1)+'" cy="'+Y(raw[i]).toFixed(1)+'" r="2.2" style="fill:'+m.color+'"/>').join('');
-  $('chart').innerHTML='<svg viewBox="0 0 '+W+' '+H+'">'+grid+'<path d="'+area+'" style="fill:'+m.color+'" opacity="0.10"/>'+
-    '<path d="'+d+'" fill="none" style="stroke:'+m.color+'" stroke-width="2" stroke-linejoin="round"/>'+dots+lab+xl+'</svg>';
-  const svg=$('chart').querySelector('svg'),tip=$('chartTip');
-  svg.addEventListener('mousemove',ev=>{const r=svg.getBoundingClientRect();const px=(ev.clientX-r.left)/r.width*W;
-    let i=Math.round((px-pl)/((W-pl-pr)/(n-1)));i=Math.max(0,Math.min(n-1,i));
-    if(raw[i]==null){tip.style.display='none';return;}
-    tip.style.display='block';tip.style.left=(X(i)/W*r.width)+'px';tip.style.top=(Y(raw[i])/H*r.height)+'px';
-    tip.innerHTML='<b>'+m.fmt(raw[i])+'</b><span>'+shortDate(dates[i])+'</span>';});
-  svg.addEventListener('mouseleave',()=>tip.style.display='none');
-}
-function spark(vals,color){
-  vals=vals.filter(v=>v!=null&&!isNaN(v)); if(vals.length<2)return'';
-  const w=120,h=34,p=3,mn=Math.min(...vals),mx=Math.max(...vals),rng=mx-mn||1;
-  const X=i=>p+i*(w-2*p)/(vals.length-1),Y=v=>h-p-((v-mn)/rng)*(h-2*p);
-  const pts=vals.map((v,i)=>X(i).toFixed(1)+','+Y(v).toFixed(1));
-  return'<svg class="spark" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none">'+
-    '<path d="M'+X(0).toFixed(1)+','+(h-p)+' L'+pts.join(' L')+' L'+X(vals.length-1).toFixed(1)+','+(h-p)+' Z" style="fill:'+color+'" opacity="0.13"/>'+
-    '<path d="M'+pts.join(' L')+'" fill="none" style="stroke:'+color+'" stroke-width="1.5"/>'+
-    '<circle cx="'+X(vals.length-1).toFixed(1)+'" cy="'+Y(vals[vals.length-1]).toFixed(1)+'" r="2" style="fill:'+color+'"/></svg>';
-}
-
-/* ---------- tabs / layout ---------- */
-function toggleSection(headerId,cardEl,show){
-  const h=$(headerId);if(h)h.style.display=show?'':'none';
-  if(cardEl)cardEl.style.display=show?'':'none';
-  const b=document.querySelector('#tabs button[data-t="'+headerId+'"]');if(b)b.style.display=show?'':'none';
-}
-function setActiveTab(id){document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===id));}
-function resetSingleLayout(){$('sumH').textContent='Tổng quan tài khoản';$('tblH').textContent='Chấm điểm chi tiết';
-  toggleSection('secFunnel',$('funnel'),true);}
-
-/* ---------- render single ---------- */
-function renderCards(a,ctx,series){
-  const c=$('cards');c.innerHTML='';
-  const roasCls=a.roas>=ctx.breakeven?'good':a.roas>=0.7*ctx.breakeven?'warn':'bad';
-  const sp=series||{};
-  const items=[
-    ['Chi tiêu',F.money(a.spend,CUR),'',null,spark(sp.spend||[],'var(--accent)')],
-    ['Doanh thu',F.money(a.revenue,CUR),a.purch+' đơn',null,spark((sp.spend||[]).map((_,i)=>(sp.roas&&sp.roas[i]!=null&&sp.spend?sp.spend[i]*sp.roas[i]:null)),'var(--good)')],
-    ['ROAS',F.x(a.roas),'hòa vốn '+F.x(ctx.breakeven),roasCls,spark(sp.roas||[],'var(--good)')],
-    ['CPO',a.cpo!=null?F.money(a.cpo,CUR):'—','',null,spark(sp.cpo||[],'var(--bad)')],
-    ['CTR (link)',F.pct(a.ctr),'',null,spark(sp.ctr||[],'var(--ok)')],
-    ['CPC',F.money(a.cpc,CUR),'',null,''],
-    ['CPM',F.money(a.cpm,CUR),'',null,spark(sp.cpm||[],'var(--warn)')],
-    ['Frequency',F.num(a.freq,2),a.freq>3.5?'⚠ fatigue':'',a.freq>3.5?'warn':null,spark(sp.freq||[],'var(--warn)')]
-  ];
-  items.forEach(([k,v,d,cls,sk],i)=>{const el=document.createElement('div');el.className='sc';el.style.animationDelay=(i*40)+'ms';
-    el.innerHTML='<div class="k">'+k+'</div><div class="v '+(cls||'')+'">'+v+'</div><div class="d">'+(d||'&nbsp;')+'</div>'+(sk||'');
-    c.appendChild(el);});
-}
-function renderFunnel(a,ctx){
-  const stages=[['Hiển thị',a.impr,null],['Click link',a.linkClicks,a.impr>0?a.linkClicks/a.impr*100:0],
-    ['Xem landing',a.lpViews,a.linkClicks>0?a.lpViews/a.linkClicks*100:0],['Mua hàng',a.purch,a.linkClicks>0?a.purch/a.linkClicks*100:0]];
-  const d=diagnose(a,ctx);
-  const weakIdx={'Click (CTR)':1,'Sau click (CVR)':3,'Hiển thị (CPM)':0,'Tần suất':1}[d.link];
-  const max=stages[0][1]||1;
-  let html='<div class="verdict"><b>Mắt xích yếu nhất: '+d.link+'.</b> '+d.text+'</div>';
-  stages.forEach((s,i)=>{const w=Math.max(max>0?s[1]/max*100:0,s[1]>0?1.5:0),weak=i===weakIdx;
-    html+='<div class="stage'+(weak?' weak':'')+'"><div class="lbl">'+s[0]+'<small>'+F.num(s[1])+'</small></div>'+
-      '<div class="bar-track"><div class="bar-fill" data-w="'+w.toFixed(2)+'"></div></div><div class="stage-num">'+(i===0?'100%':'')+'</div></div>';
-    if(s[2]!=null&&i>0){const cw=(d.link==='Click (CTR)'&&i===1)||(d.link==='Sau click (CVR)'&&i===3);
-      html+='<div class="conv'+(cw?' weak':'')+'">↳ tỉ lệ '+F.pct(s[2],2)+' so với bước trước</div>';}});
-  $('funnel').innerHTML=html;
-  requestAnimationFrame(()=>$('funnel').querySelectorAll('.bar-fill').forEach(b=>b.style.width=b.dataset.w+'%'));
-}
-function renderActions(scored,ctx){
-  const list=scored.filter(x=>x.s.grade.rank<=2).map(x=>({...x,d:diagnose(x.m,ctx)}))
-    .sort((p,q)=>(q.d.severity-p.d.severity)||(q.m.spend-p.m.spend)).slice(0,6);
-  const el=$('actions');
-  if(!list.length){el.innerHTML='<div class="act ok"><div class="sev"></div><div class="body"><div class="who">Không có cảnh báo lớn 🎉</div><p>Các đơn vị đều ở mức Khá trở lên trong kỳ này.</p></div></div>';return;}
-  el.innerHTML=list.map(x=>{const sev=x.d.severity>=3?'bad':x.d.severity>=2?'warn':'ok';
-    return'<div class="act '+sev+'"><div class="sev"></div><div class="body">'+
-      '<div class="who">'+esc(x.m.name)+'<span class="sp">'+F.money(x.m.spend,CUR)+' · '+x.s.grade.label+'</span></div>'+
-      '<p><span class="lab p">Vấn đề</span>'+x.d.text+'</p><p><span class="lab a">Hành động</span>'+x.d.action+'</p>'+
-      '<p><span class="lab e">Kỳ vọng</span>'+x.d.expect+'</p></div></div>';}).join('');
-}
-let sortKey='spend',sortDir=-1;
-function renderTable(scored,ctx){
-  const cols=[['name','Tên'],['spend','Chi tiêu'],['roas','ROAS'],['cpo','CPO'],['purch','Đơn'],['ctr','CTR'],
-    ['cpc','CPC'],['cpm','CPM'],['freq','Freq'],['pct','Điểm'],['grade','Xếp hạng'],['diag','Chẩn đoán']];
-  const rows=scored.map(x=>({...x,d:diagnose(x.m,ctx)}));
-  rows.sort((a,b)=>{let av,bv;
-    if(sortKey==='pct'||sortKey==='grade'){av=a.s.pct;bv=b.s.pct;}
-    else if(sortKey==='diag'){av=a.d.severity;bv=b.d.severity;}
-    else if(sortKey==='name')return sortDir*String(a.m.name).localeCompare(b.m.name);
-    else{av=a.m[sortKey]??-1;bv=b.m[sortKey]??-1;}return sortDir*((av>bv)-(av<bv));});
-  let h='<thead><tr>'+cols.map(c=>'<th data-k="'+c[0]+'">'+c[1]+(sortKey===c[0]?(sortDir<0?' ↓':' ↑'):'')+'</th>').join('')+'</tr></thead><tbody>';
-  rows.forEach(x=>{const m=x.m,s=x.s;
-    h+='<tr><td title="'+esc(m.name)+'">'+esc(m.name)+'</td><td class="num">'+F.money(m.spend,CUR)+'</td>'+
-      '<td class="num">'+F.x(m.roas)+'</td><td class="num">'+(m.cpo!=null?F.money(m.cpo,CUR):'—')+'</td>'+
-      '<td class="num">'+F.num(m.purch)+'</td><td class="num">'+F.pct(m.ctr)+'</td><td class="num">'+F.money(m.cpc,CUR)+'</td>'+
-      '<td class="num">'+F.money(m.cpm,CUR)+'</td><td class="num">'+F.num(m.freq,2)+'</td><td class="num">'+s.pct+'</td>'+
-      '<td><span class="chip '+s.grade.cls+'">'+s.grade.label+'</span></td>'+
-      '<td class="diag"><b>'+x.d.link+'.</b> '+x.d.text+(s.notes.length?' <i>('+s.notes.join('; ')+')</i>':'')+'</td></tr>';});
-  h+='</tbody>';$('tbl').innerHTML=h;
-  $('tbl').querySelectorAll('th').forEach(th=>th.onclick=()=>{const k=th.dataset.k;if(k===sortKey)sortDir*=-1;else{sortKey=k;sortDir=-1;}renderTable(scored,ctx);});
-  window.__csv=()=>{const head=['Tên','Chi tiêu','Doanh thu','ROAS','CPO','Đơn','CTR%','CPC','CPM','Freq','Điểm','Xếp hạng','Mắt xích yếu','Chẩn đoán'];
-    const lines=[head.join(',')].concat(rows.map(x=>{const m=x.m,s=x.s;
-      return[q(m.name),m.spend,m.revenue,r2(m.roas),m.cpo!=null?Math.round(m.cpo):'',m.purch,r2(m.ctr),Math.round(m.cpc),Math.round(m.cpm),r2(m.freq),s.pct,s.grade.label,x.d.link,q(x.d.text)].join(',');}));
-    dl(lines,'jps-ads-'+$('level').value);};
-}
-function dl(lines,name){const blob=new Blob(['\uFEFF'+lines.join('\n')],{type:'text/csv;charset=utf-8'});
-  const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name+'-'+Date.now()+'.csv';a.click();URL.revokeObjectURL(u);}
-
-/* ---------- quy tắc đặt tên: parse + gom nhóm ---------- */
+/* naming */
 const PAGE_MAP={JPS:'Japanshop.vn','ĐQ':'Đỗ Quang',TH:'Trung Hòa',NVL:'Nguyễn Văn Lộc','TĐN':'Trần Đăng Ninh','MĐ':'Mỹ Đình',Time:'Timecity','NGĐ':'Ngoại Giao Đoàn',LVS:'Lê Văn Sỹ',NTT:'Nguyễn Thị Thập',HBT:'Hai Bà Trưng'};
 const STAFF_MAP={HaiVi:'Dương Hải Vi',QuanNA:'Nguyễn Anh Quân',Vanh:'Phạm Thị Vân Anh',trangle:'Lê Thị Huyền Trang',Chungpv:'Phạm Văn Chung',quantm:'Trần Minh Quân',AnhVV:'Vũ Văn Anh','Thế Anh':'Nguyễn Thế Anh'};
 const RUN_MAP={Mess:'Cuộc trò chuyện',Purchase:'Lượt mua trên Meta',CPO:'Lượt mua trên web',Engage:'Lượt tương tác',Reach:'Tiếp cận',LDP:'Chuyển đổi LDP'};
 const GROUP_MAP={'Giày':'Giày Kosu',Gunze:'Đồ lót Gunze',MP:'Mỹ phẩm','MP Tóc':'Mỹ phẩm tóc',Japanshop:'Chung các dự án'};
-function lookup(map,code){if(code==null||code==='')return'';if(map[code])return map[code];
-  const k=Object.keys(map).find(x=>x.toLowerCase()===String(code).toLowerCase());return k?map[k]:code;}
+function lookup(map,code){if(code==null||code==='')return'';if(map[code])return map[code];const k=Object.keys(map).find(x=>x.toLowerCase()===String(code).toLowerCase());return k?map[k]:code;}
 function parseName(name){
-  const s=(name||'').trim(); let page='',cuahang='',nhom='',staff='',run='',ngay='',matched=false;
-  if(/^FB[_ ]?O2O/i.test(s)){
-    const p=s.split('_').map(x=>x.trim());
-    cuahang=p[2]||'';nhom=p[3]||'';staff=p[4]||'';ngay=p[5]||'';run=p[7]||p[p.length-1]||'';matched=p.length>=6;
-  }else{
-    const p=s.split(/\s+-\s+/).map(x=>x.trim());
-    if(p.length>=4){page=p[0];nhom=p[1];staff=p[2];run=p[3];ngay=p[4]||'';matched=true;}
-  }
+  const s=(name||'').trim();let page='',cuahang='',nhom='',staff='',run='',ngay='',matched=false;
+  if(/^FB[_ ]?O2O/i.test(s)){const p=s.split('_').map(x=>x.trim());cuahang=p[2]||'';nhom=p[3]||'';staff=p[4]||'';ngay=p[5]||'';run=p[7]||p[p.length-1]||'';matched=p.length>=6;}
+  else{const p=s.split(/\s+-\s+/).map(x=>x.trim());if(p.length>=4){page=p[0];nhom=p[1];staff=p[2];run=p[3];ngay=p[4]||'';matched=true;}}
   return{page,cuahang,loc:page||cuahang,nhom,staff,run,ngay,matched};
 }
 const DIMS={
@@ -675,194 +486,303 @@ function renderGroup(ctx,rows){
   h+='</tbody>';$('gtbl').innerHTML=h;
 }
 
-/* ---------- render single (có lọc) ---------- */
-const anyFilter=()=>!!(FILTERS.staff||FILTERS.page||FILTERS.cuahang);
-const matchFilter=m=>(!FILTERS.staff||m._p.staff===FILTERS.staff)&&(!FILTERS.page||m._p.page===FILTERS.page)&&(!FILTERS.cuahang||m._p.cuahang===FILTERS.cuahang);
-function fillSel(id,label,codes,name){const el=$(id);el.disabled=codes.length===0;
-  el.innerHTML='<option value="">'+label+': tất cả'+(codes.length?'':' (không có)')+'</option>'+
-    codes.map(c=>'<option value="'+esc(c)+'">'+esc(name(c))+'</option>').join('');el.value='';}
-function populateFilters(){
-  const uniq=sel=>{const s=new Set();ROWS.forEach(m=>{const v=sel(m._p);if(v)s.add(v);});return[...s].sort();};
-  fillSel('fStaff','Nhân sự',uniq(p=>p.staff),c=>lookup(STAFF_MAP,c));
-  fillSel('fPage','Page',uniq(p=>p.page),c=>lookup(PAGE_MAP,c));
-  fillSel('fShop','Cửa hàng',uniq(p=>p.cuahang),c=>lookup(PAGE_MAP,c));
+/* filters + assessment */
+const anyFilter=()=>!!(FILTERS.staff||FILTERS.page||FILTERS.cuahang||FILTERS.channel);
+const channelOf=m=>m._p.cuahang?'o2o':(m._p.page?'online':'other');
+const matchFilter=m=>{const ch=FILTERS.channel;if(ch&&channelOf(m)!==ch)return false;
+  return(!FILTERS.staff||m._p.staff===FILTERS.staff)&&(!FILTERS.page||m._p.page===FILTERS.page)&&(!FILTERS.cuahang||m._p.cuahang===FILTERS.cuahang);};
+function scopeLabel(){const p=[];if(FILTERS.channel)p.push(FILTERS.channel==='online'?'Online':'Cửa hàng');
+  if(FILTERS.staff)p.push(lookup(STAFF_MAP,FILTERS.staff));if(FILTERS.page)p.push(lookup(PAGE_MAP,FILTERS.page));if(FILTERS.cuahang)p.push(lookup(PAGE_MAP,FILTERS.cuahang));
+  return p.length?p.join(' · '):'Tất cả campaign';}
+function renderAssessment(rows,acc,ctx){
+  const be=ctx.breakeven,el=$('assess'); $('assessScope').textContent=scopeLabel();
+  if(!rows.length){el.innerHTML='<p class="amuted">Không có campaign nào trong phạm vi này.</p>';return;}
+  const v=acc.roas>=1.2*be?['good','Tổng thể TỐT']:acc.roas>=be?['ok','Tổng thể ĐẠT — trên hòa vốn']:acc.roas>=0.7*be?['warn','Tổng thể CẦN CẢI THIỆN']:['bad','Tổng thể KÉM — dưới hòa vốn'];
+  const notes=[]; notes.push(['info',rows.length+' campaign · chi tiêu '+F.money(acc.spend,CUR)+' · doanh thu '+F.money(acc.revenue,CUR)+' · '+F.num(acc.purch)+' đơn · ROAS '+F.x(acc.roas)+' (hòa vốn '+F.x(be)+').']);
+  const under=rows.filter(m=>m.roas>0&&m.roas<be),wasted=under.reduce((s,m)=>s+m.spend,0);
+  if(under.length)notes.push([acc.spend&&wasted/acc.spend>0.3?'bad':'warn',F.num(acc.spend?wasted/acc.spend*100:0,0)+'% chi tiêu ('+F.money(wasted,CUR)+', '+under.length+' campaign) dưới hòa vốn → ưu tiên xử lý.']);
+  const stopSpend=ctx.stoploss||(ctx.targetCPO?ctx.targetCPO*3:Infinity);
+  const burn=rows.filter(m=>m.purch===0&&m.spend>=stopSpend).sort((a,b)=>b.spend-a.spend);
+  if(burn.length)notes.push(['bad',burn.length+' campaign đốt tiền chưa ra đơn (nên DỪNG): '+burn.slice(0,3).map(m=>esc(m.name)+' '+F.money(m.spend,CUR)).join('; ')+(burn.length>3?'…':'')]);
+  const byKey=keyfn=>{const g={};rows.forEach(m=>{const k=keyfn(m)||'(không rõ)';(g[k]=g[k]||[]).push(m);});return Object.entries(g).map(([k,rs])=>{const a=aggMetrics(rs);a._k=k;return a;});};
+  if(!FILTERS.staff){const st=byKey(m=>m._p.staff).filter(a=>a.spend>0&&a._k!=='(không rõ)').sort((a,b)=>b.roas-a.roas);
+    if(st.length>=2){const b=st[0],w=st[st.length-1];
+      notes.push(['good','Nhân sự tốt nhất: '+esc(lookup(STAFF_MAP,b._k))+' — ROAS '+F.x(b.roas)+' ('+F.money(b.spend,CUR)+').']);
+      notes.push([w.roas<be?'warn':'info','Nhân sự thấp nhất: '+esc(lookup(STAFF_MAP,w._k))+' — ROAS '+F.x(w.roas)+' ('+F.money(w.spend,CUR)+').']);}
+  }else{const loc=byKey(m=>m._p.loc).filter(a=>a.spend>0&&a._k!=='(không rõ)').sort((a,b)=>b.spend-a.spend);
+    if(loc.length)notes.push(['info','Phụ trách '+loc.length+' page/cửa hàng: '+loc.slice(0,8).map(a=>esc(lookup(PAGE_MAP,a._k))+' '+F.x(a.roas)+(a.roas<be?'⚠':'')).join(' · ')+'.']);}
+  const fat=rows.filter(m=>m.freq>3.5).sort((a,b)=>b.spend-a.spend);
+  if(fat.length)notes.push(['warn',fat.length+' campaign tần suất >3.5 (fatigue) → làm mới creative. Vd '+esc(fat[0].name)+' freq '+F.num(fat[0].freq,1)+'.']);
+  const learn=rows.filter(m=>m.purch/(ctx.days/7)<50).length;
+  if(learn)notes.push(['info',learn+'/'+rows.length+' campaign chưa đủ ~50 đơn/tuần (học máy) — số liệu chưa hoàn toàn tin cậy.']);
+  const matched=rows.filter(m=>m._p.matched).length;
+  if(matched<rows.length)notes.push(['warn',(rows.length-matched)+' campaign đặt tên chưa đúng quy tắc → không gom nhóm được.']);
+  el.innerHTML='<div class="averdict '+v[0]+'">'+v[1]+' · ROAS '+F.x(acc.roas)+'</div><ul class="notes-list">'+notes.map(n=>'<li class="ni '+n[0]+'"><span class="nd"></span><span>'+n[1]+'</span></li>').join('')+'</ul>';
 }
+
+/* API */
+function fieldsFor(level){const b=['spend','impressions','reach','frequency','clicks','inline_link_clicks','ctr','inline_link_click_ctr','cpc','cpm','actions','action_values','cost_per_action_type','purchase_roas','objective'];
+  if(level==='campaign')b.push('campaign_name'); if(level==='adset')b.push('campaign_name','adset_name');
+  if(level==='ad')b.push('campaign_name','adset_name','ad_name','quality_ranking','engagement_rate_ranking','conversion_rate_ranking'); return b.join(',');}
+function timeParam(){const p=$('preset').value;if(p==='custom')return"&time_range="+encodeURIComponent(JSON.stringify({since:$('since').value,until:$('until').value}));return"&date_preset="+p;}
+async function gget(url){const r=await fetch(url);const j=await r.json();if(j.error){const e=j.error;throw new Error(e.error_user_msg||e.message||'Lỗi API');}return j;}
+async function fetchAll(base,maxPages){let url=base+"&limit=200",out=[],g=0,mx=maxPages||25;while(url&&g++<mx){const j=await gget(url);out=out.concat(j.data||[]);url=j.paging&&j.paging.next?j.paging.next:null;}return out;}
+async function fetchDaily(G,actId,token){
+  const f=['spend','impressions','inline_link_clicks','clicks','inline_link_click_ctr','ctr','cpm','frequency','actions','action_values','purchase_roas'].join(',');
+  const rows=await fetchAll(G+actId+'/insights?level=account&time_increment=1&fields='+f+timeParam()+'&access_token='+encodeURIComponent(token));
+  rows.sort((a,b)=>(a.date_start||'').localeCompare(b.date_start||''));
+  const s={dates:[],spend:[],roas:[],purch:[],ctr:[],cpm:[],cpo:[],freq:[]};
+  rows.forEach(r=>{const m=metrics(r);s.dates.push(r.date_start);s.spend.push(m.spend);s.roas.push(m.roas||null);s.purch.push(m.purch);s.ctr.push(m.ctr||null);s.cpm.push(m.cpm||null);s.cpo.push(m.cpo);s.freq.push(m.freq||null);});
+  return s;
+}
+const METRICS={spend:{label:'Chi tiêu',fmt:v=>F.money(v,CUR),color:'var(--accent)'},roas:{label:'ROAS',fmt:v=>F.x(v),color:'var(--good)'},
+  purch:{label:'Đơn',fmt:v=>F.num(v),color:'var(--accent)'},ctr:{label:'CTR',fmt:v=>F.pct(v),color:'var(--ok)'},
+  cpm:{label:'CPM',fmt:v=>F.money(v,CUR),color:'var(--warn)'},cpo:{label:'CPO',fmt:v=>v!=null?F.money(v,CUR):'—',color:'var(--bad)'}};
+function trendInsight(s){
+  if(s.dates.length<6)return'<span class="ti-muted">Cần ≥6 ngày dữ liệu để phân tích xu hướng.</span>';
+  const half=Math.floor(s.dates.length/2),mean=(arr,a,b)=>{const x=arr.slice(a,b).filter(v=>v!=null&&!isNaN(v));return x.length?x.reduce((p,c)=>p+c,0)/x.length:null;};
+  const r1=mean(s.roas,0,half),r2=mean(s.roas,half),c1=mean(s.ctr,0,half),c2=mean(s.ctr,half),f1=mean(s.freq,0,half),f2=mean(s.freq,half);
+  const dR=r1?(r2-r1)/r1*100:0,dC=c1?(c2-c1)/c1*100:0,dF=f1?(f2-f1)/f1*100:0,ar=v=>v>=0?'▲':'▼'; let v;
+  if(dR<-10&&(dC<-5||dF>10))v='<b class="bad">Dấu hiệu fatigue:</b> ROAS nửa cuối giảm '+Math.abs(dR).toFixed(0)+'%'+(dC<-5?', CTR giảm '+Math.abs(dC).toFixed(0)+'%':'')+(dF>10?', tần suất tăng '+dF.toFixed(0)+'%':'')+' → làm mới creative / đổi tệp.';
+  else if(dR>10)v='<b class="good">Đang lên:</b> ROAS nửa cuối tăng '+dR.toFixed(0)+'% → cân nhắc scale từ từ.';
+  else v='<b>Ổn định:</b> ROAS dao động '+(dR>=0?'+':'')+dR.toFixed(0)+'% giữa hai nửa kỳ.';
+  return v+'<span class="ti-d">ROAS '+ar(dR)+Math.abs(dR).toFixed(0)+'% · CTR '+ar(dC)+Math.abs(dC).toFixed(0)+'% · Freq '+ar(dF)+Math.abs(dF).toFixed(0)+'%</span>';
+}
+function renderTrend(series){SERIES=series;$('trendInsight').innerHTML=trendInsight(series);
+  $('trendChips').innerHTML=Object.keys(METRICS).map(k=>'<button class="mchip'+(k===curMetric?' on':'')+'" data-m="'+k+'">'+METRICS[k].label+'</button>').join('');
+  $('trendChips').querySelectorAll('.mchip').forEach(b=>b.onclick=()=>{curMetric=b.dataset.m;renderTrend(series);});drawChart(series,curMetric);}
+function drawChart(series,key){
+  const m=METRICS[key],dates=series.dates,raw=series[key],n=dates.length,idx=[];raw.forEach((v,i)=>{if(v!=null&&!isNaN(v))idx.push(i);});
+  if(idx.length<2){$('chart').innerHTML='<div class="empty">Chưa đủ dữ liệu theo ngày.</div>';return;}
+  const W=720,H=250,pl=8,pr=14,pt=14,pb=24,vals=idx.map(i=>raw[i]);let mn=Math.min(...vals),mx=Math.max(...vals);
+  if(mn===mx){mn=mn*0.9;mx=mx*1.1||1;}const pad=(mx-mn)*0.12;mn-=pad;if(key!=='roas'&&mn<0)mn=0;mx+=pad;
+  const X=i=>pl+i*(W-pl-pr)/(n-1),Y=v=>pt+(1-(v-mn)/(mx-mn))*(H-pt-pb);let grid='',lab='';
+  for(let g=0;g<=3;g++){const vv=mn+(mx-mn)*g/3,y=Y(vv);grid+='<line class="grid" x1="'+pl+'" y1="'+y.toFixed(1)+'" x2="'+(W-pr)+'" y2="'+y.toFixed(1)+'"/>';lab+='<text class="yl" x="'+(W-pr)+'" y="'+(y-3).toFixed(1)+'">'+m.fmt(vv)+'</text>';}
+  let d='',st=false;raw.forEach((v,i)=>{if(v==null||isNaN(v)){st=false;return;}d+=(st?' L':' M')+X(i).toFixed(1)+','+Y(v).toFixed(1);st=true;});
+  const f=idx[0],l=idx[idx.length-1];let area='M'+X(f).toFixed(1)+','+(H-pb);raw.forEach((v,i)=>{if(v==null||isNaN(v))return;area+=' L'+X(i).toFixed(1)+','+Y(v).toFixed(1);});area+=' L'+X(l).toFixed(1)+','+(H-pb)+' Z';
+  const xi=[0,Math.floor((n-1)/2),n-1],xl=xi.map(i=>'<text class="xl" x="'+X(i).toFixed(1)+'" y="'+(H-7)+'" text-anchor="'+(i===0?'start':i===n-1?'end':'middle')+'">'+shortDate(dates[i])+'</text>').join('');
+  const dots=idx.map(i=>'<circle cx="'+X(i).toFixed(1)+'" cy="'+Y(raw[i]).toFixed(1)+'" r="2.2" style="fill:'+m.color+'"/>').join('');
+  $('chart').innerHTML='<svg viewBox="0 0 '+W+' '+H+'">'+grid+'<path d="'+area+'" style="fill:'+m.color+'" opacity="0.10"/><path d="'+d+'" fill="none" style="stroke:'+m.color+'" stroke-width="2" stroke-linejoin="round"/>'+dots+lab+xl+'</svg>';
+  const svg=$('chart').querySelector('svg'),tip=$('chartTip');
+  svg.addEventListener('mousemove',ev=>{const r=svg.getBoundingClientRect(),px=(ev.clientX-r.left)/r.width*W;let i=Math.round((px-pl)/((W-pl-pr)/(n-1)));i=Math.max(0,Math.min(n-1,i));
+    if(raw[i]==null){tip.style.display='none';return;}tip.style.display='block';tip.style.left=(X(i)/W*r.width)+'px';tip.style.top=(Y(raw[i])/H*r.height)+'px';tip.innerHTML='<b>'+m.fmt(raw[i])+'</b><span>'+shortDate(dates[i])+'</span>';});
+  svg.addEventListener('mouseleave',()=>tip.style.display='none');
+}
+function spark(vals,color){vals=vals.filter(v=>v!=null&&!isNaN(v));if(vals.length<2)return'';
+  const w=120,h=32,p=3,mn=Math.min(...vals),mx=Math.max(...vals),rng=mx-mn||1,X=i=>p+i*(w-2*p)/(vals.length-1),Y=v=>h-p-((v-mn)/rng)*(h-2*p),pts=vals.map((v,i)=>X(i).toFixed(1)+','+Y(v).toFixed(1));
+  return'<svg class="spark" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none"><path d="M'+X(0).toFixed(1)+','+(h-p)+' L'+pts.join(' L')+' L'+X(vals.length-1).toFixed(1)+','+(h-p)+' Z" style="fill:'+color+'" opacity="0.13"/><path d="M'+pts.join(' L')+'" fill="none" style="stroke:'+color+'" stroke-width="1.5"/><circle cx="'+X(vals.length-1).toFixed(1)+'" cy="'+Y(vals[vals.length-1]).toFixed(1)+'" r="2" style="fill:'+color+'"/></svg>';}
+
+/* tree */
+let EXPANDED=new Set(); const cid=n=>String(n._id||n.name);
+async function fetchTree(G,actId,token){
+  const f=['campaign_id','campaign_name','adset_id','adset_name','ad_id','ad_name','objective','spend','impressions','reach','frequency','clicks','inline_link_clicks','ctr','inline_link_click_ctr','cpc','cpm','actions','action_values','purchase_roas','quality_ranking','engagement_rate_ranking','conversion_rate_ranking'].join(',');
+  const raw=await fetchAll(G+actId+'/insights?level=ad&fields='+f+timeParam()+'&access_token='+encodeURIComponent(token),50);
+  const camps={};
+  raw.forEach(r=>{const m=metrics(r);const ck=r.campaign_id||r.campaign_name||'?',ak=r.adset_id||r.adset_name||'?';
+    if(!camps[ck])camps[ck]={id:ck,name:r.campaign_name||'—',objective:(r.objective||'').toUpperCase(),adsets:{}};
+    const c=camps[ck];if(!c.adsets[ak])c.adsets[ak]={id:ak,name:r.adset_name||'—',ads:[]};m.level='ad';m._id=r.ad_id||r.ad_name;c.adsets[ak].ads.push(m);});
+  return Object.keys(camps).map(ck=>{const c=camps[ck];
+    const adsets=Object.keys(c.adsets).map(ak=>{const as=c.adsets[ak],ads=as.ads.filter(a=>a.spend>0).sort((x,y)=>y.spend-x.spend);
+      const n=aggMetrics(ads);n.name=as.name;n.level='adset';n._id=as.id;n.objective=c.objective;n.children=ads;return n;}).filter(n=>n.spend>0).sort((x,y)=>y.spend-x.spend);
+    const node=aggMetrics(adsets);node.name=c.name;node.level='campaign';node._id=c.id;node.objective=c.objective;node.children=adsets;node._p=parseName(c.name);return node;}).filter(n=>n.spend>0);
+}
+function nodeRow(node,s,d,depth,kids,exp){
+  const pad=12+depth*22,caret=kids?'<span class="caret">'+(exp?'▾':'▸')+'</span>':'<span class="caret" style="opacity:.25">·</span>',badge=depth===0?'':'<span class="lv">'+(node.level==='adset'?'AS':'Ad')+'</span>';
+  return'<tr class="lv'+depth+'" data-id="'+esc(cid(node))+'"'+(kids?' data-kids="1" style="cursor:pointer"':'')+'>'+
+    '<td style="padding-left:'+pad+'px" title="'+esc(node.name)+'">'+caret+' '+badge+esc(node.name)+'</td>'+
+    '<td class="num">'+F.money(node.spend,CUR)+'</td><td class="num">'+F.x(node.roas)+'</td><td class="num">'+(node.cpo!=null?F.money(node.cpo,CUR):'—')+'</td>'+
+    '<td class="num">'+F.num(node.purch)+'</td><td class="num">'+F.pct(node.ctr)+'</td><td class="num">'+F.money(node.cpc,CUR)+'</td><td class="num">'+F.money(node.cpm,CUR)+'</td>'+
+    '<td class="num">'+F.num(node.freq,2)+'</td><td class="num">'+s.pct+'</td><td><span class="chip '+s.grade.cls+'">'+s.grade.label+'</span></td>'+
+    '<td class="diag"><b>'+d.link+'.</b> '+d.text+(s.notes.length?' <i>('+s.notes.join('; ')+')</i>':'')+'</td></tr>';
+}
+function renderTree(scored,ctx){
+  const cols=[['name','Tên'],['spend','Chi tiêu'],['roas','ROAS'],['cpo','CPO'],['purch','Đơn'],['ctr','CTR'],['cpc','CPC'],['cpm','CPM'],['freq','Freq'],['pct','Điểm'],['grade','Xếp hạng'],['diag','Chẩn đoán']];
+  const camps=scored.slice().sort((a,b)=>{let av,bv;if(sortKey==='pct'||sortKey==='grade'){av=a.s.pct;bv=b.s.pct;}else if(sortKey==='name')return sortDir*String(a.m.name).localeCompare(b.m.name);else{av=a.m[sortKey]??-1;bv=b.m[sortKey]??-1;}return sortDir*((av>bv)-(av<bv));});
+  let body='';
+  camps.forEach(c=>{const cn=c.m,ce=EXPANDED.has(cid(cn)),ck=cn.children&&cn.children.length;body+=nodeRow(cn,c.s,diagnose(cn,ctx),0,ck,ce);
+    if(ce&&cn.children)cn.children.forEach(as=>{const ae=EXPANDED.has(cid(as)),ak=as.children&&as.children.length;body+=nodeRow(as,score(as,ctx),diagnose(as,ctx),1,ak,ae);
+      if(ae&&as.children)as.children.forEach(ad=>{body+=nodeRow(ad,score(ad,ctx),diagnose(ad,ctx),2,false,false);});});});
+  $('tbl').innerHTML='<thead><tr>'+cols.map(c=>'<th data-k="'+c[0]+'">'+c[1]+(sortKey===c[0]?(sortDir<0?' ↓':' ↑'):'')+'</th>').join('')+'</tr></thead><tbody>'+body+'</tbody>';
+  $('tbl').querySelectorAll('th').forEach(th=>th.onclick=()=>{const k=th.dataset.k;if(k===sortKey)sortDir*=-1;else{sortKey=k;sortDir=-1;}renderTree(scored,ctx);});
+  $('tbl').querySelectorAll('tr[data-kids]').forEach(tr=>tr.onclick=()=>{const id=tr.dataset.id;EXPANDED.has(id)?EXPANDED.delete(id):EXPANDED.add(id);renderTree(scored,ctx);});
+  window.__csv=()=>{const head=['Cấp','Tên','Chi tiêu','Doanh thu','ROAS','CPO','Đơn','CTR%','CPC','CPM','Freq','Điểm','Xếp hạng','Mắt xích yếu','Chẩn đoán'],lines=[head.join(',')];
+    const push=(lvl,m,s)=>{const d=diagnose(m,ctx);lines.push([lvl,q(m.name),m.spend,m.revenue,r2(m.roas),m.cpo!=null?Math.round(m.cpo):'',m.purch,r2(m.ctr),Math.round(m.cpc),Math.round(m.cpm),r2(m.freq),s.pct,s.grade.label,d.link,q(d.text)].join(','));};
+    camps.forEach(c=>{push('Campaign',c.m,c.s);(c.m.children||[]).forEach(as=>{push('Ad set',as,score(as,ctx));(as.children||[]).forEach(ad=>push('Ad',ad,score(ad,ctx)));});});dl(lines,'jps-ads-tree');};
+}
+let sortKey='spend',sortDir=-1;
+function renderTable(scored,ctx){
+  if(scored.length&&scored[0].m.children)return renderTree(scored,ctx);
+  const cols=[['name','Tên'],['spend','Chi tiêu'],['roas','ROAS'],['cpo','CPO'],['purch','Đơn'],['ctr','CTR'],['cpc','CPC'],['cpm','CPM'],['freq','Freq'],['pct','Điểm'],['grade','Xếp hạng'],['diag','Chẩn đoán']];
+  const rows=scored.map(x=>({...x,d:diagnose(x.m,ctx)}));
+  rows.sort((a,b)=>{let av,bv;if(sortKey==='pct'||sortKey==='grade'){av=a.s.pct;bv=b.s.pct;}else if(sortKey==='diag'){av=a.d.severity;bv=b.d.severity;}else if(sortKey==='name')return sortDir*String(a.m.name).localeCompare(b.m.name);else{av=a.m[sortKey]??-1;bv=b.m[sortKey]??-1;}return sortDir*((av>bv)-(av<bv));});
+  let h='<thead><tr>'+cols.map(c=>'<th data-k="'+c[0]+'">'+c[1]+(sortKey===c[0]?(sortDir<0?' ↓':' ↑'):'')+'</th>').join('')+'</tr></thead><tbody>';
+  rows.forEach(x=>{const m=x.m,s=x.s;h+='<tr><td title="'+esc(m.name)+'">'+esc(m.name)+'</td><td class="num">'+F.money(m.spend,CUR)+'</td><td class="num">'+F.x(m.roas)+'</td><td class="num">'+(m.cpo!=null?F.money(m.cpo,CUR):'—')+'</td><td class="num">'+F.num(m.purch)+'</td><td class="num">'+F.pct(m.ctr)+'</td><td class="num">'+F.money(m.cpc,CUR)+'</td><td class="num">'+F.money(m.cpm,CUR)+'</td><td class="num">'+F.num(m.freq,2)+'</td><td class="num">'+s.pct+'</td><td><span class="chip '+s.grade.cls+'">'+s.grade.label+'</span></td><td class="diag"><b>'+x.d.link+'.</b> '+x.d.text+(s.notes.length?' <i>('+s.notes.join('; ')+')</i>':'')+'</td></tr>';});
+  h+='</tbody>';$('tbl').innerHTML=h;
+  $('tbl').querySelectorAll('th').forEach(th=>th.onclick=()=>{const k=th.dataset.k;if(k===sortKey)sortDir*=-1;else{sortKey=k;sortDir=-1;}renderTable(scored,ctx);});
+  window.__csv=()=>{const head=['Tên','Chi tiêu','Doanh thu','ROAS','CPO','Đơn','CTR%','CPC','CPM','Freq','Điểm','Xếp hạng','Mắt xích yếu','Chẩn đoán'],lines=[head.join(',')].concat(rows.map(x=>{const m=x.m,s=x.s;return[q(m.name),m.spend,m.revenue,r2(m.roas),m.cpo!=null?Math.round(m.cpo):'',m.purch,r2(m.ctr),Math.round(m.cpc),Math.round(m.cpm),r2(m.freq),s.pct,s.grade.label,x.d.link,q(x.d.text)].join(',');}));dl(lines,'jps-ads-'+$('level').value);};
+}
+function dl(lines,name){const blob=new Blob(['\uFEFF'+lines.join('\n')],{type:'text/csv;charset=utf-8'}),u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name+'-'+Date.now()+'.csv';a.click();URL.revokeObjectURL(u);}
+
+/* render single */
+function renderCards(a,ctx,series){
+  const c=$('cards');c.innerHTML='';const roasCls=a.roas>=ctx.breakeven?'good':a.roas>=0.7*ctx.breakeven?'warn':'bad',sp=series||{};
+  const items=[
+    ['Chi tiêu',F.money(a.spend,CUR),'',null,spark(sp.spend||[],'var(--accent)')],
+    ['Doanh thu',F.money(a.revenue,CUR),a.purch+' đơn',null,spark((sp.spend||[]).map((_,i)=>(sp.roas&&sp.roas[i]!=null&&sp.spend?sp.spend[i]*sp.roas[i]:null)),'var(--good)')],
+    ['ROAS',F.x(a.roas),'hòa vốn '+F.x(ctx.breakeven),roasCls,spark(sp.roas||[],'var(--good)')],
+    ['CPO',a.cpo!=null?F.money(a.cpo,CUR):'—','',null,spark(sp.cpo||[],'var(--bad)')],
+    ['CTR (link)',F.pct(a.ctr),'',null,spark(sp.ctr||[],'var(--ok)')],
+    ['CPC',F.money(a.cpc,CUR),'',null,''],
+    ['CPM',F.money(a.cpm,CUR),'',null,spark(sp.cpm||[],'var(--warn)')],
+    ['Frequency',F.num(a.freq,2),a.freq>3.5?'⚠ fatigue':'',a.freq>3.5?'warn':null,spark(sp.freq||[],'var(--warn)')]];
+  items.forEach(([k,v,d,cls,sk])=>{const el=document.createElement('div');el.className='sc';el.innerHTML='<div class="k">'+k+'</div><div class="v '+(cls||'')+'">'+v+'</div><div class="d">'+(d||'&nbsp;')+'</div>'+(sk||'');c.appendChild(el);});
+}
+function renderFunnel(a,ctx){
+  const stages=[['Hiển thị',a.impr,null],['Click link',a.linkClicks,a.impr>0?a.linkClicks/a.impr*100:0],['Xem landing',a.lpViews,a.linkClicks>0?a.lpViews/a.linkClicks*100:0],['Mua hàng',a.purch,a.linkClicks>0?a.purch/a.linkClicks*100:0]];
+  const d=diagnose(a,ctx),weakIdx={'Click (CTR)':1,'Sau click (CVR)':3,'Hiển thị (CPM)':0,'Tần suất':1}[d.link],max=stages[0][1]||1;
+  let html='<div class="verdict"><b>Mắt xích yếu nhất: '+d.link+'.</b> '+d.text+'</div>';
+  stages.forEach((s,i)=>{const w=Math.max(max>0?s[1]/max*100:0,s[1]>0?1.5:0),weak=i===weakIdx;
+    html+='<div class="stage'+(weak?' weak':'')+'"><div class="lbl">'+s[0]+'<small>'+F.num(s[1])+'</small></div><div class="bar-track"><div class="bar-fill" data-w="'+w.toFixed(2)+'"></div></div><div class="stage-num">'+(i===0?'100%':'')+'</div></div>';
+    if(s[2]!=null&&i>0){const cw=(d.link==='Click (CTR)'&&i===1)||(d.link==='Sau click (CVR)'&&i===3);html+='<div class="conv'+(cw?' weak':'')+'">↳ tỉ lệ '+F.pct(s[2],2)+' so với bước trước</div>';}});
+  $('funnel').innerHTML=html;requestAnimationFrame(()=>$('funnel').querySelectorAll('.bar-fill').forEach(b=>b.style.width=b.dataset.w+'%'));
+}
+function renderActions(scored,ctx){
+  const list=scored.filter(x=>x.s.grade.rank<=2).map(x=>({...x,d:diagnose(x.m,ctx)})).sort((p,q)=>(q.d.severity-p.d.severity)||(q.m.spend-p.m.spend)).slice(0,6),el=$('actions');
+  if(!list.length){el.innerHTML='<div class="act ok"><div class="sev"></div><div><div class="who">Không có cảnh báo lớn 🎉</div><p>Các đơn vị đều ở mức Khá trở lên.</p></div></div>';return;}
+  el.innerHTML=list.map(x=>{const sev=x.d.severity>=3?'bad':x.d.severity>=2?'warn':'ok';
+    return'<div class="act '+sev+'"><div class="sev"></div><div><div class="who">'+esc(x.m.name)+'<span class="sp">'+F.money(x.m.spend,CUR)+' · '+x.s.grade.label+'</span></div><p><span class="lab p">Vấn đề</span>'+x.d.text+'</p><p><span class="lab a">Hành động</span>'+x.d.action+'</p><p><span class="lab e">Kỳ vọng</span>'+x.d.expect+'</p></div></div>';}).join('');
+}
+const navEl=p=>document.querySelector('#nav button[data-p="'+p+'"]');
+function enableNav(p,on){const b=navEl(p);if(b)b.classList.toggle('off',!on);}
+function showPanel(p){if(navEl(p)&&navEl(p).classList.contains('off'))return;CURPANEL=p;
+  document.querySelectorAll('.panel').forEach(el=>el.classList.toggle('show',el.dataset.panel===p));
+  document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.p===p));
+  $('subbar').style.display=(MODE==='single'&&DATA_LOADED&&p!=='cfg')?'flex':'none';}
+const anyF=anyFilter;
+function fillSel(id,label,codes,name){const el=$(id);el.disabled=codes.length===0;el.innerHTML='<option value="">'+label+': tất cả'+(codes.length?'':' (không có)')+'</option>'+codes.map(c=>'<option value="'+esc(c)+'">'+esc(name(c))+'</option>').join('');el.value='';}
+function populateFilters(){const uniq=sel=>{const s=new Set();ROWS.forEach(m=>{const v=sel(m._p);if(v)s.add(v);});return[...s].sort();};
+  fillSel('fStaff','Nhân sự',uniq(p=>p.staff),c=>lookup(STAFF_MAP,c));fillSel('fPage','Page',uniq(p=>p.page),c=>lookup(PAGE_MAP,c));fillSel('fShop','Cửa hàng',uniq(p=>p.cuahang),c=>lookup(PAGE_MAP,c));}
+function updateFilterUI(){const ch=FILTERS.channel;$('fPage').disabled=$('fPage').options.length<=1||ch==='o2o';$('fShop').disabled=$('fShop').options.length<=1||ch==='online';
+  if(ch==='o2o'){FILTERS.page='';$('fPage').value='';}if(ch==='online'){FILTERS.cuahang='';$('fShop').value='';}}
 function renderSingle(){
-  const {ctx,accApi,series,level}=SINGLE, active=anyFilter();
-  const rows=ROWS.filter(matchFilter);
-  const acc=active?aggregate(rows):accApi;
+  const {ctx,accApi,series,level}=SINGLE,active=anyFilter(),rows=ROWS.filter(matchFilter),acc=active?aggregate(rows):accApi;
   const med=arr=>{const a=arr.filter(v=>v>0).sort((x,y)=>x-y);return a.length?a[Math.floor(a.length/2)]:0;};
   ctx.medCPM=med(rows.map(m=>m.cpm));ctx.medCPC=med(rows.map(m=>m.cpc));ctx.medCPL=med(rows.map(m=>m.cpl||0));
   const scored=rows.map(m=>({m,s:score(m,ctx)}));
-  const showTrend=!active&&series&&series.dates.length>=2;
-  toggleSection('secTrend',$('trendCard'),showTrend);
-  renderCards(acc,ctx,active?null:series);
-  if(showTrend)renderTrend(series);
-  renderFunnel(acc,ctx);renderActions(scored,ctx);renderTable(scored,ctx);
-  toggleSection('secGroup',$('groupCard'),true);renderGroup(ctx,rows);
+  renderAssessment(rows,acc,ctx);
+  const showTrend=!active&&series&&series.dates.length>=2;enableNav('trend',showTrend);
+  if(showTrend)renderTrend(series); else if(CURPANEL==='trend')showPanel('overview');
+  renderCards(acc,ctx,active?null:series);renderFunnel(acc,ctx);renderActions(scored,ctx);renderTable(scored,ctx);renderGroup(ctx,rows);
+  $('sumH').textContent=active?'Tổng quan (đã lọc)':'Tổng quan tài khoản';$('tblH').textContent='Chấm điểm chi tiết';
   $('sumRange').textContent=presetLabel()+' · '+ctx.days+' ngày'+(active?' · đang lọc':'');
-  $('tblLevel').textContent=rows.length+' '+level+(active?' (đã lọc)':' (chi tiêu > 0)');
-  $('fCount').textContent=active?rows.length+'/'+ROWS.length+' '+level:'';
+  $('tblLevel').textContent=rows.length+' '+level+(active?' (đã lọc)':'');
+  $('fCount').textContent=active?rows.length+'/'+ROWS.length:'';
 }
 
-/* ---------- main (single) ---------- */
+/* main single */
 async function run(){
   const token=$('token').value.trim(),actId=$('acct').value;
-  if(!token){setStatus('Thiếu access token.',true);return;}
-  if(!actId){setStatus('Chưa chọn tài khoản — nhập token để tải danh sách.',true);return;}
-  const ver=$('ver').value.trim()||'v23.0';
-  if(actId==='__ALL__')return runAll(token,ver);
-  const level=$('level').value;
-  const ctx={breakeven:+$('breakeven').value||3.33,targetCPO:+$('targetCPO').value||0,stoploss:+$('stoploss').value||0,days:rangeDays()};
+  if(!token){setStatus('Thiếu access token (mục Cấu hình).',true);showPanel('cfg');return;}
+  if(!actId){setStatus('Chưa chọn tài khoản.',true);return;}
+  const ver=$('ver').value.trim()||'v23.0'; if(actId==='__ALL__')return runAll(token,ver);
+  const level=$('level').value,ctx={breakeven:+$('breakeven').value||3.33,targetCPO:+$('targetCPO').value||0,stoploss:+$('stoploss').value||0,days:rangeDays()};
   if($('remember').checked)localStorage.setItem('jps_tok',token);else localStorage.removeItem('jps_tok');
-  const G='https://graph.facebook.com/'+ver+'/';
-  $('run').disabled=true;setStatus('Đang kết nối Meta…');
+  const G='https://graph.facebook.com/'+ver+'/';$('run').disabled=true;setStatus('Đang kết nối Meta…');
   try{
     const info=await gget(G+actId+'?fields=name,currency,account_status&access_token='+encodeURIComponent(token));
-    CUR=info.currency||'VND'; $('acctPill').textContent=(info.name||actId)+' · '+CUR;
+    CUR=info.currency||'VND';$('acctPill').textContent=(info.name||actId)+' · '+CUR;
     setStatus('Đang tải tổng quan…');
-    const accIns=await fetchAll(G+actId+'/insights?level=account&fields='+
-      ['spend','impressions','reach','frequency','clicks','inline_link_clicks','ctr','inline_link_click_ctr','cpc','cpm','actions','action_values','purchase_roas'].join(',')+
-      timeParam()+'&access_token='+encodeURIComponent(token));
-    setStatus('Đang tải dữ liệu '+level+'…');
-    const raw=await fetchAll(G+actId+'/insights?level='+level+'&fields='+fieldsFor(level)+timeParam()+'&access_token='+encodeURIComponent(token));
-    if(!raw.length){setStatus('Không có dữ liệu trong khoảng đã chọn.',true);$('run').disabled=false;return;}
-    ROWS=raw.map(metrics).filter(m=>m.spend>0);
-    ROWS.forEach(m=>m._p=parseName(m.name));
+    const accIns=await fetchAll(G+actId+'/insights?level=account&fields='+['spend','impressions','reach','frequency','clicks','inline_link_clicks','ctr','inline_link_click_ctr','cpc','cpm','actions','action_values','purchase_roas'].join(',')+timeParam()+'&access_token='+encodeURIComponent(token));
+    EXPANDED.clear();
+    if(level==='campaign'){setStatus('Đang tải campaign · ad set · ad…');ROWS=await fetchTree(G,actId,token);}
+    else{setStatus('Đang tải dữ liệu '+level+'…');const raw=await fetchAll(G+actId+'/insights?level='+level+'&fields='+fieldsFor(level)+timeParam()+'&access_token='+encodeURIComponent(token));ROWS=raw.map(metrics).filter(m=>m.spend>0);ROWS.forEach(m=>m._p=parseName(m.name));}
+    if(!ROWS.length){setStatus('Không có dữ liệu trong khoảng đã chọn.',true);$('run').disabled=false;return;}
     const acc=accIns.length?metrics(accIns[0]):aggregate(ROWS);
-    let series=null;
-    if(ctx.days>=2){try{setStatus('Đang tải xu hướng theo ngày…');series=await fetchDaily(G,actId,token);}catch(e){series=null;}}
-    SINGLE={ctx,accApi:acc,series,level};
-    FILTERS={staff:'',page:'',cuahang:''};
-    resetSingleLayout();
-    $('filters').style.display='flex'; populateFilters();
-    renderSingle();
-    $('results').classList.remove('hidden');setActiveTab('secOverview');
+    let series=null; if(ctx.days>=2){try{setStatus('Đang tải xu hướng theo ngày…');series=await fetchDaily(G,actId,token);}catch(e){series=null;}}
+    SINGLE={ctx,accApi:acc,series,level};FILTERS={staff:'',page:'',cuahang:'',channel:''};MODE='single';DATA_LOADED=true;
+    populateFilters();document.querySelectorAll('#scope button').forEach((x,i)=>x.classList.toggle('on',i===0));updateFilterUI();
+    ['overview','assess','funnel','actions','group','detail'].forEach(p=>enableNav(p,true));
+    renderSingle();showPanel('overview');
     setStatus('Xong — '+ROWS.length+' '+level+', '+F.money(acc.spend,CUR)+' chi tiêu.');
   }catch(e){setStatus('Lỗi: '+e.message+(/token|OAuth|session/i.test(e.message)?' — kiểm tra token & quyền ads_read.':''),true);}
   finally{$('run').disabled=false;}
 }
 function aggregate(rows){
-  const s=rows.reduce((o,m)=>{o.spend+=m.spend;o.impr+=m.impr;o.reach+=m.reach;o.linkClicks+=m.linkClicks;o.lpViews+=m.lpViews;o.purch+=m.purch;o.revenue+=m.revenue;o.leads+=m.leads;return o;},
-    {spend:0,impr:0,reach:0,linkClicks:0,lpViews:0,purch:0,revenue:0,leads:0});
-  s.ctr=s.impr>0?s.linkClicks/s.impr*100:0;s.cpc=s.linkClicks>0?s.spend/s.linkClicks:0;s.cpm=s.impr>0?s.spend/s.impr*1000:0;
-  s.freq=s.reach>0?s.impr/s.reach:0;s.roas=s.spend>0?s.revenue/s.spend:0;s.cpo=s.purch>0?s.spend/s.purch:null;
-  s.cvr=s.linkClicks>0?s.purch/s.linkClicks*100:0;s.lpRate=s.linkClicks>0?s.lpViews/s.linkClicks*100:0;
-  s.objective='';s.qr=s.er=s.cr=null;return s;
+  const s=rows.reduce((o,m)=>{o.spend+=m.spend;o.impr+=m.impr;o.reach+=m.reach;o.linkClicks+=m.linkClicks;o.lpViews+=m.lpViews;o.purch+=m.purch;o.revenue+=m.revenue;o.leads+=m.leads;return o;},{spend:0,impr:0,reach:0,linkClicks:0,lpViews:0,purch:0,revenue:0,leads:0});
+  s.ctr=s.impr>0?s.linkClicks/s.impr*100:0;s.cpc=s.linkClicks>0?s.spend/s.linkClicks:0;s.cpm=s.impr>0?s.spend/s.impr*1000:0;s.freq=s.reach>0?s.impr/s.reach:0;
+  s.roas=s.spend>0?s.revenue/s.spend:0;s.cpo=s.purch>0?s.spend/s.purch:null;s.cvr=s.linkClicks>0?s.purch/s.linkClicks*100:0;s.lpRate=s.linkClicks>0?s.lpViews/s.linkClicks*100:0;s.objective='';s.qr=s.er=s.cr=null;return s;
 }
 
-/* ---------- TẤT CẢ tài khoản ---------- */
+/* all accounts */
 function emptyMetrics(name){return{name,objective:'',spend:0,impr:0,reach:0,freq:0,linkClicks:0,ctr:0,cpc:0,cpm:0,purch:0,revenue:0,roas:0,leads:0,lpViews:0,cpo:null,cpl:null,cvr:0,lpRate:0,qr:null,er:null,cr:null};}
 async function runAll(token,ver){
   if(!ACCOUNTS.length){setStatus('Chưa có danh sách tài khoản.',true);return;}
-  const G='https://graph.facebook.com/'+ver+'/';
-  const ctx={breakeven:+$('breakeven').value||3.33,targetCPO:+$('targetCPO').value||0,stoploss:+$('stoploss').value||0,days:rangeDays()};
+  const G='https://graph.facebook.com/'+ver+'/',ctx={breakeven:+$('breakeven').value||3.33,targetCPO:+$('targetCPO').value||0,stoploss:+$('stoploss').value||0,days:rangeDays()};
   const accFields=['spend','impressions','reach','frequency','clicks','inline_link_clicks','ctr','inline_link_click_ctr','cpc','cpm','actions','action_values','purchase_roas'].join(',');
   $('run').disabled=true;const results=[];
   try{
     for(let i=0;i<ACCOUNTS.length;i++){const a=ACCOUNTS[i];setStatus('Đang tải '+(i+1)+'/'+ACCOUNTS.length+' — '+a.name);
-      try{const ins=await fetchAll(G+a.id+'/insights?level=account&fields='+accFields+timeParam()+'&access_token='+encodeURIComponent(token));
-        const m=ins.length?metrics(ins[0]):emptyMetrics(a.name);m.name=a.name;results.push({acc:a,m});}
+      try{const ins=await fetchAll(G+a.id+'/insights?level=account&fields='+accFields+timeParam()+'&access_token='+encodeURIComponent(token));const m=ins.length?metrics(ins[0]):emptyMetrics(a.name);m.name=a.name;results.push({acc:a,m});}
       catch(e){const m=emptyMetrics(a.name);results.push({acc:a,m,err:e.message});}}
-    const live=results.filter(r=>r.m.spend>0);
-    const med=arr=>{const x=arr.filter(v=>v>0).sort((p,q)=>p-q);return x.length?x[Math.floor(x.length/2)]:0;};
+    const live=results.filter(r=>r.m.spend>0),med=arr=>{const x=arr.filter(v=>v>0).sort((p,q)=>p-q);return x.length?x[Math.floor(x.length/2)]:0;};
     ctx.medCPM=med(live.map(r=>r.m.cpm));ctx.medCPC=med(live.map(r=>r.m.cpc));ctx.medCPL=med(live.map(r=>r.m.cpl||0));
     const scored=results.map(r=>({...r,s:r.m.spend>0?score(r.m,ctx):null,d:r.m.spend>0?diagnose(r.m,ctx):null}));
-    renderMulti(scored,ctx);$('results').classList.remove('hidden');setActiveTab('secOverview');
+    renderMulti(scored,ctx);showPanel('overview');
     setStatus('Xong — '+results.length+' tài khoản ('+live.length+' có chi tiêu).');
   }catch(e){setStatus('Lỗi: '+e.message,true);}finally{$('run').disabled=false;}
 }
 function renderMulti(scored,ctx){
+  MODE='multi';DATA_LOADED=true;$('acctPill').textContent='Tất cả tài khoản ('+scored.length+')';
   $('sumH').textContent='Tổng quan danh mục';$('tblH').textContent='So sánh tài khoản';
-  toggleSection('secTrend',$('trendCard'),false);toggleSection('secFunnel',$('funnel'),false);toggleSection('secGroup',$('groupCard'),false);
-  $('filters').style.display='none';
-  $('sumRange').textContent=presetLabel()+' · '+ctx.days+' ngày';$('tblLevel').textContent=scored.length+' tài khoản';
+  ['overview','actions','detail'].forEach(p=>enableNav(p,true));['assess','trend','funnel','group'].forEach(p=>enableNav(p,false));
   const live=scored.filter(r=>r.m.spend>0),curMap={},revMap={};
   live.forEach(r=>{curMap[r.acc.cur]=(curMap[r.acc.cur]||0)+r.m.spend;revMap[r.acc.cur]=(revMap[r.acc.cur]||0)+r.m.revenue;});
-  const curs=Object.keys(curMap).sort((a,b)=>curMap[b]-curMap[a]),mainCur=curs[0]||'VND';
-  const more=curs.length>1?'+'+(curs.length-1)+' tiền tệ khác':'&nbsp;';
-  const byRoas=live.filter(r=>r.m.roas>0).sort((a,b)=>b.m.roas-a.m.roas),best=byRoas[0],worst=byRoas[byRoas.length-1];
-  const totPurch=live.reduce((s,r)=>s+r.m.purch,0),warns=scored.filter(r=>r.s&&r.s.grade.rank<=2).length;
-  const cards=[['Tài khoản',live.length+'/'+scored.length,'có chi tiêu'],
-    ['Chi tiêu ('+mainCur+')',F.money(curMap[mainCur]||0,mainCur),more],
-    ['Doanh thu ('+mainCur+')',F.money(revMap[mainCur]||0,mainCur),totPurch+' đơn'],
-    ['Cảnh báo',String(warns),'tài khoản ≤ Khá',warns?'warn':'good'],
-    ['ROAS cao nhất',best?F.x(best.m.roas):'—',best?best.acc.name:'&nbsp;','good'],
-    ['ROAS thấp nhất',worst?F.x(worst.m.roas):'—',worst?worst.acc.name:'&nbsp;','bad'],
-    ['CPM trung vị',ctx.medCPM?F.num(ctx.medCPM,0):'—',curs.length>1?'(nhiều tiền tệ)':mainCur],
-    ['CPC trung vị',ctx.medCPC?F.num(ctx.medCPC,0):'—',curs.length>1?'(nhiều tiền tệ)':mainCur]];
-  const c=$('cards');c.innerHTML='';
-  cards.forEach(([k,v,d,cls],i)=>{const el=document.createElement('div');el.className='sc';el.style.animationDelay=(i*40)+'ms';
-    el.innerHTML='<div class="k">'+k+'</div><div class="v '+(cls||'')+'">'+v+'</div><div class="d">'+(d||'&nbsp;')+'</div>';c.appendChild(el);});
+  const curs=Object.keys(curMap).sort((a,b)=>curMap[b]-curMap[a]),mainCur=curs[0]||'VND',more=curs.length>1?'+'+(curs.length-1)+' tiền tệ khác':'&nbsp;';
+  const byRoas=live.filter(r=>r.m.roas>0).sort((a,b)=>b.m.roas-a.m.roas),best=byRoas[0],worst=byRoas[byRoas.length-1],totPurch=live.reduce((s,r)=>s+r.m.purch,0),warns=scored.filter(r=>r.s&&r.s.grade.rank<=2).length;
+  const cards=[['Tài khoản',live.length+'/'+scored.length,'có chi tiêu'],['Chi tiêu ('+mainCur+')',F.money(curMap[mainCur]||0,mainCur),more],['Doanh thu ('+mainCur+')',F.money(revMap[mainCur]||0,mainCur),totPurch+' đơn'],['Cảnh báo',String(warns),'tài khoản ≤ Khá',warns?'warn':'good'],['ROAS cao nhất',best?F.x(best.m.roas):'—',best?best.acc.name:'&nbsp;','good'],['ROAS thấp nhất',worst?F.x(worst.m.roas):'—',worst?worst.acc.name:'&nbsp;','bad'],['CPM trung vị',ctx.medCPM?F.num(ctx.medCPM,0):'—',curs.length>1?'(nhiều tiền tệ)':mainCur],['CPC trung vị',ctx.medCPC?F.num(ctx.medCPC,0):'—',curs.length>1?'(nhiều tiền tệ)':mainCur]];
+  const c=$('cards');c.innerHTML='';cards.forEach(([k,v,d,cls])=>{const el=document.createElement('div');el.className='sc';el.innerHTML='<div class="k">'+k+'</div><div class="v '+(cls||'')+'">'+v+'</div><div class="d">'+(d||'&nbsp;')+'</div>';c.appendChild(el);});
   const weak=scored.filter(r=>r.s&&r.s.grade.rank<=2).sort((a,b)=>(b.d.severity-a.d.severity)||(b.m.spend-a.m.spend)).slice(0,6);
-  $('actions').innerHTML=weak.length?weak.map(r=>{const sev=r.d.severity>=3?'bad':r.d.severity>=2?'warn':'ok';
-    return'<div class="act '+sev+'"><div class="sev"></div><div class="body"><div class="who">'+esc(r.acc.name)+'<span class="sp">'+F.money(r.m.spend,r.acc.cur)+' · '+r.s.grade.label+'</span></div>'+
-      '<p><span class="lab p">Vấn đề</span>'+r.d.text+'</p><p><span class="lab a">Hành động</span>'+r.d.action+'</p><p><span class="lab e">Kỳ vọng</span>'+r.d.expect+'</p></div></div>';}).join('')
-    :'<div class="act ok"><div class="sev"></div><div class="body"><div class="who">Không có tài khoản nào đáng lo 🎉</div></div></div>';
+  $('actions').innerHTML=weak.length?weak.map(r=>{const sev=r.d.severity>=3?'bad':r.d.severity>=2?'warn':'ok';return'<div class="act '+sev+'"><div class="sev"></div><div><div class="who">'+esc(r.acc.name)+'<span class="sp">'+F.money(r.m.spend,r.acc.cur)+' · '+r.s.grade.label+'</span></div><p><span class="lab p">Vấn đề</span>'+r.d.text+'</p><p><span class="lab a">Hành động</span>'+r.d.action+'</p><p><span class="lab e">Kỳ vọng</span>'+r.d.expect+'</p></div></div>';}).join(''):'<div class="act ok"><div class="sev"></div><div><div class="who">Không có tài khoản nào đáng lo 🎉</div></div></div>';
   renderMultiTable(scored,ctx,mainCur);
+  $('sumRange').textContent=presetLabel()+' · '+ctx.days+' ngày';$('tblLevel').textContent=scored.length+' tài khoản';
 }
 let mSortKey='spend',mSortDir=-1;
 function renderMultiTable(scored,ctx,mainCur){
-  const cols=[['name','Tài khoản'],['spend','Chi tiêu'],['revenue','Doanh thu'],['roas','ROAS'],['cpo','CPO'],['purch','Đơn'],
-    ['ctr','CTR'],['cpc','CPC'],['cpm','CPM'],['freq','Freq'],['pct','Điểm'],['grade','Hạng'],['diag','Chẩn đoán']];
-  const rows=scored.slice().sort((a,b)=>{let av,bv;
-    if(mSortKey==='pct'||mSortKey==='grade'){av=a.s?a.s.pct:-1;bv=b.s?b.s.pct:-1;}
-    else if(mSortKey==='diag'){av=a.d?a.d.severity:-1;bv=b.d?b.d.severity:-1;}
-    else if(mSortKey==='name')return mSortDir*String(a.acc.name).localeCompare(b.acc.name);
-    else{av=a.m[mSortKey]??-1;bv=b.m[mSortKey]??-1;}return mSortDir*((av>bv)-(av<bv));});
+  const cols=[['name','Tài khoản'],['spend','Chi tiêu'],['revenue','Doanh thu'],['roas','ROAS'],['cpo','CPO'],['purch','Đơn'],['ctr','CTR'],['cpc','CPC'],['cpm','CPM'],['freq','Freq'],['pct','Điểm'],['grade','Hạng'],['diag','Chẩn đoán']];
+  const rows=scored.slice().sort((a,b)=>{let av,bv;if(mSortKey==='pct'||mSortKey==='grade'){av=a.s?a.s.pct:-1;bv=b.s?b.s.pct:-1;}else if(mSortKey==='diag'){av=a.d?a.d.severity:-1;bv=b.d?b.d.severity:-1;}else if(mSortKey==='name')return mSortDir*String(a.acc.name).localeCompare(b.acc.name);else{av=a.m[mSortKey]??-1;bv=b.m[mSortKey]??-1;}return mSortDir*((av>bv)-(av<bv));});
   let h='<thead><tr>'+cols.map(c=>'<th data-k="'+c[0]+'">'+c[1]+(mSortKey===c[0]?(mSortDir<0?' ↓':' ↑'):'')+'</th>').join('')+'</tr></thead><tbody>';
   rows.forEach(r=>{const m=r.m,cur=r.acc.cur;
-    if(m.spend<=0){h+='<tr><td title="'+esc(r.acc.name)+'">'+esc(r.acc.name)+'</td><td colspan="11" style="text-align:left;color:var(--faint)">không chi tiêu trong kỳ'+(r.err?' · lỗi: '+esc(r.err):'')+'</td><td class="diag">—</td></tr>';return;}
-    h+='<tr data-id="'+r.acc.id+'" style="cursor:pointer"><td title="'+esc(r.acc.name)+' — bấm để xem chi tiết">'+esc(r.acc.name)+'</td>'+
-      '<td class="num">'+F.money(m.spend,cur)+'</td><td class="num">'+F.money(m.revenue,cur)+'</td><td class="num">'+F.x(m.roas)+'</td>'+
-      '<td class="num">'+(m.cpo!=null?F.money(m.cpo,cur):'—')+'</td><td class="num">'+F.num(m.purch)+'</td><td class="num">'+F.pct(m.ctr)+'</td>'+
-      '<td class="num">'+F.money(m.cpc,cur)+'</td><td class="num">'+F.money(m.cpm,cur)+'</td><td class="num">'+F.num(m.freq,2)+'</td>'+
-      '<td class="num">'+(r.s?r.s.pct:'—')+'</td><td>'+(r.s?'<span class="chip '+r.s.grade.cls+'">'+r.s.grade.label+'</span>':'—')+'</td>'+
-      '<td class="diag">'+(r.d?'<b>'+r.d.link+'.</b> '+r.d.text:'—')+(r.s&&r.s.notes.length?' <i>('+r.s.notes.join('; ')+')</i>':'')+'</td></tr>';});
+    if(m.spend<=0){h+='<tr><td title="'+esc(r.acc.name)+'">'+esc(r.acc.name)+'</td><td colspan="11" style="text-align:left;color:var(--faint)">không chi tiêu'+(r.err?' · lỗi: '+esc(r.err):'')+'</td><td class="diag">—</td></tr>';return;}
+    h+='<tr data-id="'+r.acc.id+'" style="cursor:pointer"><td title="'+esc(r.acc.name)+' — bấm xem chi tiết">'+esc(r.acc.name)+'</td><td class="num">'+F.money(m.spend,cur)+'</td><td class="num">'+F.money(m.revenue,cur)+'</td><td class="num">'+F.x(m.roas)+'</td><td class="num">'+(m.cpo!=null?F.money(m.cpo,cur):'—')+'</td><td class="num">'+F.num(m.purch)+'</td><td class="num">'+F.pct(m.ctr)+'</td><td class="num">'+F.money(m.cpc,cur)+'</td><td class="num">'+F.money(m.cpm,cur)+'</td><td class="num">'+F.num(m.freq,2)+'</td><td class="num">'+(r.s?r.s.pct:'—')+'</td><td>'+(r.s?'<span class="chip '+r.s.grade.cls+'">'+r.s.grade.label+'</span>':'—')+'</td><td class="diag">'+(r.d?'<b>'+r.d.link+'.</b> '+r.d.text:'—')+'</td></tr>';});
   h+='</tbody>';$('tbl').innerHTML=h;
   $('tbl').querySelectorAll('th').forEach(th=>th.onclick=()=>{const k=th.dataset.k;if(k===mSortKey)mSortDir*=-1;else{mSortKey=k;mSortDir=-1;}renderMultiTable(scored,ctx,mainCur);});
-  $('tbl').querySelectorAll('tbody tr[data-id]').forEach(tr=>tr.onclick=()=>{$('acct').value=tr.dataset.id;window.scrollTo({top:0,behavior:'smooth'});run();});
-  window.__csv=()=>{const head=['Tài khoản','Tiền tệ','Chi tiêu','Doanh thu','ROAS','CPO','Đơn','CTR%','CPC','CPM','Freq','Điểm','Hạng','Mắt xích yếu','Chẩn đoán'];
-    const lines=[head.join(',')].concat(rows.map(r=>{const m=r.m;
-      return[q(r.acc.name),r.acc.cur,m.spend,m.revenue,r2(m.roas),m.cpo!=null?Math.round(m.cpo):'',m.purch,r2(m.ctr),Math.round(m.cpc),Math.round(m.cpm),r2(m.freq),r.s?r.s.pct:'',r.s?r.s.grade.label:'',r.d?r.d.link:'',q(r.d?r.d.text:'')].join(',');}));
-    dl(lines,'jps-ads-all');};
+  $('tbl').querySelectorAll('tbody tr[data-id]').forEach(tr=>tr.onclick=()=>{$('acct').value=tr.dataset.id;run();});
+  window.__csv=()=>{const head=['Tài khoản','Tiền tệ','Chi tiêu','Doanh thu','ROAS','CPO','Đơn','CTR%','CPC','CPM','Freq','Điểm','Hạng','Mắt xích yếu','Chẩn đoán'],lines=[head.join(',')].concat(rows.map(r=>{const m=r.m;return[q(r.acc.name),r.acc.cur,m.spend,m.revenue,r2(m.roas),m.cpo!=null?Math.round(m.cpo):'',m.purch,r2(m.ctr),Math.round(m.cpc),Math.round(m.cpm),r2(m.freq),r.s?r.s.pct:'',r.s?r.s.grade.label:'',r.d?r.d.link:'',q(r.d?r.d.text:'')].join(',');}));dl(lines,'jps-ads-all');};
 }
 
-/* ---------- accounts ---------- */
+/* accounts */
 async function loadAccounts(){
-  const token=$('token').value.trim();if(!token)return;
-  const ver=$('ver').value.trim()||'v23.0',sel=$('acct');setStatus('Đang tải danh sách tài khoản…');
+  const token=$('token').value.trim();if(!token)return;const ver=$('ver').value.trim()||'v23.0',sel=$('acct');setStatus('Đang tải danh sách tài khoản…');
   try{const rows=await fetchAll('https://graph.facebook.com/'+ver+'/me/adaccounts?fields=name,currency,account_status&access_token='+encodeURIComponent(token));
     if(!rows.length){sel.innerHTML='<option value="">không có tài khoản</option>';setStatus('Token không truy cập được tài khoản nào.',true);return;}
     ACCOUNTS=rows.map(a=>({id:a.id,name:a.name||a.id,cur:a.currency||'VND',status:a.account_status}));
-    sel.innerHTML='<option value="__ALL__">★ Tất cả tài khoản ('+rows.length+')</option>'+
-      ACCOUNTS.map(a=>'<option value="'+a.id+'" data-cur="'+a.cur+'">'+esc(a.name)+(a.status&&a.status!==1?' (ngưng)':'')+'</option>').join('');
-    setStatus(rows.length+' tài khoản — chọn 1 hoặc "Tất cả" rồi bấm phân tích.');
-  }catch(e){sel.innerHTML='<option value="">— nhập token trước —</option>';
-    setStatus('Lỗi tải tài khoản: '+e.message+(/token|OAuth|session/i.test(e.message)?' — kiểm tra token & quyền ads_read.':''),true);}
+    sel.innerHTML='<option value="__ALL__">★ Tất cả tài khoản ('+rows.length+')</option>'+ACCOUNTS.map(a=>'<option value="'+a.id+'" data-cur="'+a.cur+'">'+esc(a.name)+(a.status&&a.status!==1?' (ngưng)':'')+'</option>').join('');
+    setStatus(rows.length+' tài khoản — chọn rồi bấm Phân tích.');
+  }catch(e){sel.innerHTML='<option value="">— nhập token trước —</option>';setStatus('Lỗi tải tài khoản: '+e.message+(/token|OAuth|session/i.test(e.message)?' — kiểm tra token & quyền ads_read.':''),true);}
 }
 
-/* ---------- wiring ---------- */
-$('preset').onchange=()=>$('customRange').style.display=$('preset').value==='custom'?'grid':'none';
+/* wiring */
+$('nav').querySelectorAll('button').forEach(b=>b.onclick=()=>showPanel(b.dataset.p));
 $('run').onclick=run;
 $('csv').onclick=()=>window.__csv&&window.__csv();
+$('preset').onchange=()=>$('customRange').style.display=$('preset').value==='custom'?'flex':'none';
 $('token').addEventListener('blur',loadAccounts);
-['fStaff','fPage','fShop'].forEach(id=>$(id).addEventListener('change',()=>{
-  FILTERS={staff:$('fStaff').value,page:$('fPage').value,cuahang:$('fShop').value};renderSingle();}));
-$('fClear').onclick=()=>{FILTERS={staff:'',page:'',cuahang:''};$('fStaff').value=$('fPage').value=$('fShop').value='';renderSingle();};
-document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{const t=$(b.dataset.t);if(t){setActiveTab(b.dataset.t);t.scrollIntoView({behavior:'smooth',block:'start'});}});
-// scroll spy
-let spyT;window.addEventListener('scroll',()=>{clearTimeout(spyT);spyT=setTimeout(()=>{
-  if($('results').classList.contains('hidden'))return;
-  const ids=['secOverview','secTrend','secFunnel','secActions','secGroup','secDetail'];let cur=ids[0];
-  for(const id of ids){const el=$(id);if(el&&el.style.display!=='none'&&el.getBoundingClientRect().top<=90)cur=id;}
-  setActiveTab(cur);},80);});
-// theme
-function setTheme(t){document.documentElement.setAttribute('data-theme',t);$('theme').textContent=t==='dark'?'☾':'☀';localStorage.setItem('jps_theme',t);
-  if(SERIES&&!$('trendCard').style.display)drawChart(SERIES,curMetric);}
+['fStaff','fPage','fShop'].forEach(id=>$(id).addEventListener('change',()=>{FILTERS={staff:$('fStaff').value,page:$('fPage').value,cuahang:$('fShop').value,channel:FILTERS.channel};renderSingle();}));
+$('fClear').onclick=()=>{FILTERS={staff:'',page:'',cuahang:'',channel:FILTERS.channel};$('fStaff').value=$('fPage').value=$('fShop').value='';renderSingle();};
+document.querySelectorAll('#scope button').forEach(b=>b.onclick=()=>{FILTERS.channel=b.dataset.c;document.querySelectorAll('#scope button').forEach(x=>x.classList.toggle('on',x===b));updateFilterUI();renderSingle();});
+function setTheme(t){document.documentElement.setAttribute('data-theme',t);$('theme').textContent=t==='dark'?'☀':'☾';localStorage.setItem('jps_theme',t);if(SERIES&&CURPANEL==='trend')drawChart(SERIES,curMetric);}
 $('theme').onclick=()=>setTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');
 setTheme(localStorage.getItem('jps_theme')||'dark');
-// restore token
 const saved=localStorage.getItem('jps_tok');if(saved){$('token').value=saved;$('remember').checked=true;loadAccounts();}
 </script>
 </body>
